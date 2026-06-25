@@ -1,0 +1,54 @@
+{
+  "name": "@tactile/react",
+  "version": "0.1.0",
+  "description": "React hooks for @tactile/core — context-aware keyboard shortcuts.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tactile/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "jsdom": "^25.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "keywords": ["react", "keyboard", "shortcut", "hotkey", "keybinding", "hooks"],
+  "license": "MIT",
+  "author": "Lohith Mallikarjun",
+  "homepage": "https://github.com/tactile-js/tactile/tree/main/packages/react#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tactile-js/tactile.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/tactile-js/tactile/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

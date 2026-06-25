@@ -1,0 +1,40 @@
+{
+  "name": "@tactile/core",
+  "version": "0.1.0",
+  "description": "A modern, context-aware keyboard shortcut engine. Framework-agnostic core.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["keyboard", "shortcut", "hotkey", "keybinding", "keymap"],
+  "license": "MIT",
+  "author": "Lohith Mallikarjun",
+  "homepage": "https://github.com/tactile-js/tactile/tree/main/packages/core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tactile-js/tactile.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/tactile-js/tactile/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

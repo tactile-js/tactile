@@ -1,0 +1,12 @@
+/* eslint-env node */
+module.exports = {
+  root: true,
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+  env: { browser: true, node: true, es2021: true },
+  ignorePatterns: ['dist', 'node_modules', '*.config.ts', '*.config.js'],
+  rules: {
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+  },
+};

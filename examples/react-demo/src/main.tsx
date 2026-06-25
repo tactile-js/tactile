@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { KeybindProvider } from '@tactile/react';
+import { KeybindProvider } from '@tactile-js/react';
 import { App } from './App.js';
 import './styles.css';
 

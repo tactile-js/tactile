@@ -1,17 +1,17 @@
-# @tactile/core
+# @tactile-js/core
 
 The framework-agnostic keyboard-shortcut engine behind [keybind](../../README.md).
 Structured rules, a `when`-expression context system, layout-aware matching, and
 collision detection — with no hard dependency on the DOM.
 
 ```bash
-npm install @tactile/core
+npm install @tactile-js/core
 ```
 
 ## Usage
 
 ```ts
-import { createKeybindingEngine } from '@tactile/core';
+import { createKeybindingEngine } from '@tactile-js/core';
 
 const kb = createKeybindingEngine({
   defaultMatch: 'hybrid', // 'hybrid' | 'physical' | 'logical'

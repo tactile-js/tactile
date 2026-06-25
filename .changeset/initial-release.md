@@ -1,6 +1,6 @@
 ---
-'@tactile/core': minor
-'@tactile/react': minor
+'@tactile-js/core': minor
+'@tactile-js/react': minor
 ---
 
 Initial release: a context-aware keyboard shortcut engine.

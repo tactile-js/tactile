@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { ContextValue } from '@tactile/core';
+import type { ContextValue } from '@tactile-js/core';
 import { useEngine } from './context.js';
 
 export interface ScopeControls {

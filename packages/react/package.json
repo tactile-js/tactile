@@ -1,7 +1,7 @@
 {
-  "name": "@tactile/react",
+  "name": "@tactile-js/react",
   "version": "0.1.0",
-  "description": "React hooks for @tactile/core — context-aware keyboard shortcuts.",
+  "description": "React hooks for @tactile-js/core — context-aware keyboard shortcuts.",
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
@@ -22,7 +22,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@tactile/core": "workspace:*"
+    "@tactile-js/core": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=17"

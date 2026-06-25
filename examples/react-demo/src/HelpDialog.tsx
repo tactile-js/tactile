@@ -1,4 +1,4 @@
-import { useKeymap } from '@tactile/react';
+import { useKeymap } from '@tactile-js/react';
 
 /** Auto-generated shortcut help — built entirely from the engine's keymap, so it
  *  can never drift from what's actually registered. */

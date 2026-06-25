@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { RecordedShortcut } from '@tactile/core';
+import type { RecordedShortcut } from '@tactile-js/core';
 import { useEngine } from './context.js';
 
 export interface ShortcutRecorder {

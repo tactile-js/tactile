@@ -38,7 +38,7 @@ importers:
 
   examples/react-demo:
     dependencies:
-      '@tactile/react':
+      '@tactile-js/react':
         specifier: workspace:*
         version: link:../../packages/react
       react:
@@ -65,7 +65,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@tactile/core':
+      '@tactile-js/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

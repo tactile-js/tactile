@@ -1,5 +1,5 @@
 /**
- * @tactile/core — a modern, context-aware keyboard shortcut engine.
+ * @tactile-js/core — a modern, context-aware keyboard shortcut engine.
  *
  * The public surface is intentionally small. Most apps need only
  * `createKeybindingEngine` plus the types; the lower-level helpers are exported

@@ -1,12 +1,12 @@
-# @tactile/react
+# @tactile-js/react
 
-React hooks for [`@tactile/core`](../core). The adapter manages engine lifecycle
+React hooks for [`@tactile-js/core`](../core). The adapter manages engine lifecycle
 and binding registration around the component lifecycle — it contains no
 key-matching logic of its own, and re-exports the core so you can import from one
 place.
 
 ```bash
-npm install @tactile/react
+npm install @tactile-js/react
 ```
 
 `react >= 17` is a peer dependency.
@@ -16,7 +16,7 @@ npm install @tactile/react
 Wrap your app once:
 
 ```tsx
-import { KeybindProvider } from '@tactile/react';
+import { KeybindProvider } from '@tactile-js/react';
 
 <KeybindProvider options={{ defaultMatch: 'hybrid' }}>
   <App />
@@ -31,7 +31,7 @@ import {
   useScope,
   useShortcutRecorder,
   useKeymap,
-} from '@tactile/react';
+} from '@tactile-js/react';
 
 // Register a shortcut for the component's lifetime (auto add/remove).
 useShortcut({

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useShortcut, useScope, useShortcutRecorder, useEngine } from '@tactile/react';
+import { useShortcut, useScope, useShortcutRecorder, useEngine } from '@tactile-js/react';
 import { CommandPalette, type Command } from './CommandPalette.js';
 import { HelpDialog } from './HelpDialog.js';
 import { KeyInspector } from './KeyInspector.js';

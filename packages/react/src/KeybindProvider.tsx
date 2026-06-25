@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { createKeybindingEngine, type EngineOptions, type KeybindingEngine } from '@tactile/core';
+import { createKeybindingEngine, type EngineOptions, type KeybindingEngine } from '@tactile-js/core';
 import { KeybindContext } from './context.js';
 
 export interface KeybindProviderProps {

@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { KeybindingEngine } from '@tactile/core';
+import type { KeybindingEngine } from '@tactile-js/core';
 
 /** Shared engine instance, provided by {@link KeybindProvider}. */
 export const KeybindContext = createContext<KeybindingEngine | null>(null);
@@ -11,7 +11,7 @@ export const KeybindContext = createContext<KeybindingEngine | null>(null);
 export function useEngine(): KeybindingEngine {
   const engine = useContext(KeybindContext);
   if (!engine) {
-    throw new Error('@tactile/react: hooks must be used inside a <KeybindProvider>.');
+    throw new Error('@tactile-js/react: hooks must be used inside a <KeybindProvider>.');
   }
   return engine;
 }

@@ -14,13 +14,13 @@ and explicit collision resolution — with thin adapters on top.
 
 | Package | What it is |
 | --- | --- |
-| [`@tactile/core`](packages/core) | The engine: parsing, matching, context, collisions, recording. No DOM assumptions you can't override. |
-| [`@tactile/react`](packages/react) | React hooks — `useShortcut`, `useScope`, `useShortcutRecorder`, `useKeymap`. |
+| [`@tactile-js/core`](packages/core) | The engine: parsing, matching, context, collisions, recording. No DOM assumptions you can't override. |
+| [`@tactile-js/react`](packages/react) | React hooks — `useShortcut`, `useScope`, `useShortcutRecorder`, `useKeymap`. |
 
 ## Quick taste
 
 ```ts
-import { createKeybindingEngine } from '@tactile/core';
+import { createKeybindingEngine } from '@tactile-js/core';
 
 const kb = createKeybindingEngine();
 
@@ -37,7 +37,7 @@ kb.context.set('scope', 'editor'); // gate other rules on the active scope
 ```
 
 ```tsx
-import { KeybindProvider, useShortcut } from '@tactile/react';
+import { KeybindProvider, useShortcut } from '@tactile-js/react';
 
 function Editor() {
   useShortcut({
@@ -117,7 +117,7 @@ pnpm -r test       # vitest (core: Node; react: jsdom)
 pnpm -r typecheck
 pnpm lint
 
-pnpm --filter @tactile/example-react-demo dev   # the interactive demo
+pnpm --filter @tactile-js/example-react-demo dev   # the interactive demo
 ```
 
 The demo (`examples/react-demo`) is the fastest way to feel the design: a command

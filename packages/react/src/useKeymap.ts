@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from 'react';
-import type { ResolvedBinding } from '@tactile/core';
+import type { ResolvedBinding } from '@tactile-js/core';
 import { useEngine } from './context.js';
 
 export interface UseKeymapOptions {

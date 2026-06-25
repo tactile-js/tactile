@@ -2,8 +2,8 @@
 
 Thanks for your interest. This is a pnpm monorepo:
 
-- `packages/core` — `@tactile/core`, the framework-agnostic engine
-- `packages/react` — `@tactile/react`, the React adapter
+- `packages/core` — `@tactile-js/core`, the framework-agnostic engine
+- `packages/react` — `@tactile-js/react`, the React adapter
 - `examples/react-demo` — an interactive demo
 
 ## Getting set up
@@ -15,7 +15,7 @@ pnpm -r test
 pnpm -r typecheck
 pnpm lint
 
-pnpm --filter @tactile/example-react-demo dev   # play with the demo
+pnpm --filter @tactile-js/example-react-demo dev   # play with the demo
 ```
 
 ## Making a change

@@ -1,5 +1,5 @@
 /**
- * @tactile/react — thin React bindings over @tactile/core.
+ * @tactile-js/react — thin React bindings over @tactile-js/core.
  *
  * The adapter contains no key-matching logic of its own; it manages engine
  * lifecycle and binding registration around the React component lifecycle, and
@@ -18,4 +18,4 @@ export { useKeymap } from './useKeymap.js';
 export type { UseKeymapOptions } from './useKeymap.js';
 
 // Re-export the core surface for one-import ergonomics.
-export * from '@tactile/core';
+export * from '@tactile-js/core';

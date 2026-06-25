@@ -3,9 +3,9 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["@tactile/core", "@tactile/react"]],
+  "linked": [["@tactile-js/core", "@tactile-js/react"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@tactile/example-react-demo"]
+  "ignore": ["@tactile-js/example-react-demo"]
 }

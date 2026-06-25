@@ -1,6 +1,6 @@
 {
   "name": "@tactile-js/react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React hooks for @tactile-js/core — context-aware keyboard shortcuts.",
   "type": "module",
   "sideEffects": false,
@@ -14,7 +14,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
@@ -35,7 +37,14 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
-  "keywords": ["react", "keyboard", "shortcut", "hotkey", "keybinding", "hooks"],
+  "keywords": [
+    "react",
+    "keyboard",
+    "shortcut",
+    "hotkey",
+    "keybinding",
+    "hooks"
+  ],
   "license": "MIT",
   "author": "Lohith Mallikarjun",
   "homepage": "https://github.com/tactile-js/tactile/tree/main/packages/react#readme",

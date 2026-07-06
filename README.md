@@ -1,5 +1,9 @@
 # Tactile
 
+[![@tactile-js/core](https://img.shields.io/npm/v/@tactile-js/core?label=%40tactile-js%2Fcore)](https://www.npmjs.com/package/@tactile-js/core)
+[![@tactile-js/react](https://img.shields.io/npm/v/@tactile-js/react?label=%40tactile-js%2Freact)](https://www.npmjs.com/package/@tactile-js/react)
+[![license](https://img.shields.io/npm/l/@tactile-js/core)](LICENSE)
+
 A keyboard-shortcut engine that takes context and keyboard layouts seriously.
 
 Most shortcut libraries are built on `KeyboardEvent.keyCode`, treat scopes as an
@@ -16,6 +20,16 @@ and explicit collision resolution — with thin adapters on top.
 | --- | --- |
 | [`@tactile-js/core`](packages/core) | The engine: parsing, matching, context, collisions, recording. No DOM assumptions you can't override. |
 | [`@tactile-js/react`](packages/react) | React hooks — `useShortcut`, `useScope`, `useShortcutRecorder`, `useKeymap`. |
+
+## Install
+
+```bash
+# framework-agnostic core
+npm install @tactile-js/core
+
+# React hooks (pulls in core)
+npm install @tactile-js/react
+```
 
 ## Quick taste
 

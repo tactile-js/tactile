@@ -1,0 +1,39 @@
+---
+title: Match modes (layout-aware)
+description: How Tactile matches keyboard shortcuts across international layouts using event.key and event.code — hybrid, physical, and logical modes. The fix for keyCode's i18n problems.
+---
+
+This is the single most important design decision in Tactile, and the thing the popular incumbents
+get wrong by leaning entirely on the deprecated `keyCode`.
+
+The engine keeps two ideas separate: the **character** a key produces (`KeyboardEvent.key`) and its
+**physical position** (`KeyboardEvent.code`). Each binding token is matched by one or the other,
+chosen by the match mode.
+
+| Mode | Letters & digits | Named keys (Enter, ↑, F5) | Symbols (`?`, `/`) |
+| --- | --- | --- | --- |
+| `hybrid` *(default)* | physical (`code`) | logical (`key`) | logical (`key`) |
+| `physical` | physical | physical | falls back to `key` |
+| `logical` | logical | logical | logical |
+
+## Why hybrid defaults the way it does
+
+- **Letters → physical.** `⌘K` should be the K *position* — that's what app authors almost always
+  mean, and it stays put when the layout changes the character. On a German layout where the physical
+  `KeyZ` produces "y", `⌘Z` still fires on the Z key. `keyCode`-based libraries get this wrong.
+- **Symbols → logical.** You mean the glyph `?`, whose physical key differs by layout. Matching the
+  character is the only thing that behaves internationally.
+- **Named keys → logical.** `Enter`, `ArrowUp`, `F5` have stable, layout-independent `key` values.
+
+Override per binding with `match`, or globally with `defaultMatch`:
+
+```ts
+const kb = createKeybindingEngine({ defaultMatch: 'hybrid' });
+
+kb.add({ id: 'vim.down', keys: 'j', match: 'physical', handler: down });
+```
+
+:::tip
+Not sure what your hardware reports for a given key? Open the [playground](/playground/) — it has a
+live KeyboardEvent inspector showing `key`, `code`, and which one hybrid mode would use.
+:::

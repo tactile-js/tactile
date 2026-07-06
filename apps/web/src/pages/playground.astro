@@ -1,0 +1,186 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Playground from '../components/playground/Playground.tsx';
+
+const title = 'Playground — Tactile keyboard shortcuts';
+const description =
+  'Try Tactile live in your browser: press shortcuts, inspect KeyboardEvents, toggle scopes, record bindings, and watch collision detection — all running the real @tactile-js engine.';
+---
+
+<Base title={title} description={description}>
+  <Nav />
+  <main class="wrap">
+    <p class="eyebrow">// playground</p>
+    <h1 class="title">Try it live.</h1>
+    <p class="lede">
+      Everything below runs the real <code>@tactile-js/core</code> engine in your browser — the same
+      code you'd ship. Press keys and watch it resolve.
+    </p>
+    <Playground client:only="react">
+      <p slot="fallback" class="pg__muted">Loading playground…</p>
+    </Playground>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 2rem 1.5rem 0;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--green-dim);
+    margin: 0 0 1rem;
+  }
+  .title {
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    margin: 0 0 1rem;
+  }
+  .lede {
+    max-width: 42rem;
+    color: var(--text-dim);
+    margin: 0 0 2.5rem;
+  }
+  .lede code {
+    font-family: var(--font-mono);
+    color: var(--green);
+    font-size: 0.95em;
+  }
+</style>
+
+<style is:global>
+  .pg__hint {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-mute);
+    margin-bottom: 1.5rem;
+  }
+  .pg__hint kbd,
+  .pg code kbd {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    padding: 0.1em 0.45em;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 3px;
+    border-radius: 5px;
+    color: var(--text);
+  }
+  .pg__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .pg__card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.25rem;
+  }
+  .pg__card h3 {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin: 0 0 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pg__kv {
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .pg__kv div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .pg__kv dt {
+    color: var(--text-mute);
+    font-size: 0.85rem;
+  }
+  .pg__kv dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+  .pg__accent {
+    color: var(--green);
+  }
+  .pg__muted {
+    color: var(--text-mute);
+    font-size: 0.9rem;
+  }
+  .pg__pill {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: var(--green-tint);
+    color: var(--green-bright);
+    border: 1px solid var(--green-dim);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .pg__editor {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.85rem;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    min-height: 90px;
+    cursor: text;
+  }
+  .pg__editor:focus {
+    outline: 2px solid var(--green);
+    outline-offset: 0;
+    color: var(--text);
+  }
+  .pg__editor code,
+  .pg__card code {
+    font-family: var(--font-mono);
+    color: var(--green);
+    font-size: 0.9em;
+  }
+  .pg__btn {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.5rem 0.9rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .pg__btn--rec {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .pg__rec {
+    margin: 0.9rem 0 0;
+  }
+  .pg__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.45rem;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+  }
+  .pg__list code {
+    font-family: var(--font-mono);
+    color: var(--text);
+  }
+</style>

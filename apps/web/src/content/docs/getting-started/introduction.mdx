@@ -1,0 +1,33 @@
+---
+title: Introduction
+description: Tactile is a modern, context-aware keyboard shortcut engine for the web — layout-aware matching, when-expressions, and collision detection, with a framework-agnostic core and React hooks.
+---
+
+Tactile is a keyboard-shortcut engine that takes **context** and **keyboard layouts** seriously.
+
+Most shortcut libraries are built on the deprecated `KeyboardEvent.keyCode`, treat scopes as an
+afterthought, and leave you to discover binding conflicts at runtime. Tactile starts from a different
+place: a small framework-agnostic core modeled on VS Code's keybinding system — structured rules, a
+`when`-expression context system, and explicit collision resolution — with thin adapters on top.
+
+## What makes it different
+
+- **Layout-aware matching.** Bindings match against `event.key` *and* `event.code` depending on what
+  the key is — never the deprecated `keyCode`. `⌘Z` lands on the physical Z key across layouts; `?`
+  matches the character you'd expect. See [Match modes](/concepts/matching/).
+- **`when` expressions, not flags.** Gate any rule with a boolean expression over context keys
+  (`scope == 'editor' && !readOnly`). Named scopes are just sugar over context keys — one concept to
+  learn, not two.
+- **Collisions are first-class.** `getCollisions()` tells you when two rules fight over the same
+  keystroke; at runtime, ties resolve by priority then registration order, the same model VS Code uses.
+- **A real core/adapter split.** The engine talks to a `KeyEventSource` interface, not the DOM
+  directly — so it's fully unit-tested in Node and reusable by any framework adapter.
+
+## Packages
+
+| Package | What it is |
+| --- | --- |
+| `@tactile-js/core` | The framework-agnostic engine. |
+| `@tactile-js/react` | React hooks — `useShortcut`, `useScope`, `useShortcutRecorder`, `useKeymap`. |
+
+Ready? Head to [Installation](/getting-started/installation/).

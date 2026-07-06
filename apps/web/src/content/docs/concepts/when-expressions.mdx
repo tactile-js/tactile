@@ -1,0 +1,48 @@
+---
+title: Context & when expressions
+description: Gate keyboard shortcuts with VS Code-style when expressions over context keys. Scopes are just sugar over context keys in Tactile.
+---
+
+Every rule can carry a `when` expression — a boolean gate evaluated against a **context-key store**.
+The same keystroke can do different things in different contexts, without ad-hoc flags.
+
+```ts
+kb.context.set('scope', 'editor');
+kb.context.set('readOnly', false);
+
+kb.add({
+  id: 'editor.bold',
+  keys: 'mod+b',
+  when: "scope == 'editor' && !readOnly",
+  handler: toggleBold,
+});
+```
+
+When you press `⌘B`, the engine evaluates `when` against the current context and only fires if it's
+true.
+
+## The expression language
+
+Modeled on VS Code's `when` clauses:
+
+| Feature | Example |
+| --- | --- |
+| Truthiness | `editorFocus` |
+| Equality | `scope == 'editor'`, `mode != 'insert'` |
+| Boolean | `a && b`, `a \|\| b`, `!a` |
+| Grouping | `a && (b \|\| c)` |
+| Membership | `lang in 'ts js tsx'` |
+
+Identifiers may contain dots (`editor.langId`) to match how hosts namespace context keys.
+
+## Scopes are just context keys
+
+There's no separate "scope" concept to learn. A named scope is a context key:
+
+```ts
+kb.context.set('scope', 'editor');       // when: "scope == 'editor'"
+kb.context.set('scope.terminal', true);  // when: "scope.terminal"
+```
+
+In React, [`useScope`](/react/overview/) gives you `setScope`, `enableScope`, and friends as a thin
+convenience over exactly this.

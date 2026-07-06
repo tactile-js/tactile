@@ -1,0 +1,70 @@
+/*
+ * Map Starlight's theme variables onto the Tactile palette so the docs match the
+ * bespoke landing. Dark-only (pitch black + green).
+ */
+:root {
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+}
+
+:root,
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #103b2a;
+  --sl-color-accent: #2c8f66;
+  --sl-color-accent-high: #7ee6b3;
+
+  --sl-color-white: #e6eae8;
+  --sl-color-gray-1: #e6eae8;
+  --sl-color-gray-2: #c3c9c6;
+  --sl-color-gray-3: #9aa3a0;
+  --sl-color-gray-4: #6a7370;
+  --sl-color-gray-5: #3a4240;
+  --sl-color-gray-6: #1c2120;
+  --sl-color-gray-7: #141817;
+  --sl-color-black: #0a0b0c;
+
+  --sl-color-bg: #0a0b0c;
+  --sl-color-bg-nav: rgba(10, 11, 12, 0.85);
+  --sl-color-bg-sidebar: #0c0e10;
+  --sl-color-bg-inline-code: #171a1d;
+  --sl-color-hairline: rgba(255, 255, 255, 0.08);
+  --sl-color-hairline-light: rgba(255, 255, 255, 0.08);
+  --sl-color-text-accent: var(--green);
+}
+
+/* Force dark: this is a pitch-black brand, no light mode. */
+:root[data-theme='light'] {
+  color-scheme: dark;
+}
+
+/* Mono-forward headings and site title, TUI flavor. */
+.site-title,
+site-title a {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.sl-markdown-content h1,
+.sl-markdown-content h2 {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+}
+
+/* Links pick up the signature green. */
+.sl-markdown-content a:not(:where(.not-content *)) {
+  color: var(--green);
+  text-underline-offset: 3px;
+}
+
+/* Keycap styling for inline <kbd> inside docs. */
+.sl-markdown-content kbd {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  padding: 0.15em 0.5em;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+}

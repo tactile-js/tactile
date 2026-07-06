@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tactile-js.vercel.app/sitemap-index.xml

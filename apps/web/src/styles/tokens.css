@@ -1,0 +1,58 @@
+/*
+ * Tactile design tokens — Oxide-inspired: pitch black, a signature green, and a
+ * mono-forward TUI character. Shared by the bespoke landing/playground pages and
+ * mapped onto Starlight's variables in starlight-theme.css.
+ */
+:root {
+  --bg: #0a0b0c;
+  --bg-deep: #070809;
+  --surface: #121417;
+  --surface-2: #171a1d;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --text: #e6eae8;
+  --text-dim: #9aa3a0;
+  --text-mute: #6a7370;
+
+  --green: #48d597;
+  --green-bright: #5fe3a8;
+  --green-dim: #2c8f66;
+  --green-tint: rgba(72, 213, 151, 0.1);
+
+  --amber: #f0b429;
+  --blue: #5b9df9;
+  --coral: #e8664e;
+  --purple: #9b87f5;
+
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+
+  --radius: 8px;
+  --radius-lg: 12px;
+  --maxw: 1120px;
+}
+
+/* Keycap — the signature motif. A physical-looking key for bindings. */
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.9em;
+  height: 1.9em;
+  padding: 0 0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  line-height: 1;
+}
+.keycap--green {
+  color: var(--green-bright);
+  border-color: var(--green-dim);
+  background: var(--green-tint);
+}

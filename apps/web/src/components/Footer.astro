@@ -1,0 +1,93 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <span class="footer__word">tactile</span>
+      <span class="footer__tag">Keyboard shortcuts, done right.</span>
+    </div>
+    <div class="footer__cols">
+      <div class="footer__col">
+        <span class="footer__head">Docs</span>
+        <a href="/getting-started/introduction/">Introduction</a>
+        <a href="/getting-started/quick-start/">Quick start</a>
+        <a href="/concepts/matching/">Match modes</a>
+        <a href="/playground/">Playground</a>
+      </div>
+      <div class="footer__col">
+        <span class="footer__head">Project</span>
+        <a href="https://github.com/tactile-js/tactile">GitHub</a>
+        <a href="https://www.npmjs.com/package/@tactile-js/core">npm — core</a>
+        <a href="https://www.npmjs.com/package/@tactile-js/react">npm — react</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer__base">
+    <span>© {year} · MIT licensed</span>
+    <span>Built with Tactile.</span>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--border);
+    margin-top: 6rem;
+  }
+  .footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3rem;
+    justify-content: space-between;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 3rem 1.5rem 2rem;
+  }
+  .footer__word {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+  .footer__tag {
+    color: var(--text-mute);
+    font-size: 0.9rem;
+  }
+  .footer__cols {
+    display: flex;
+    gap: 4rem;
+  }
+  .footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .footer__head {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-mute);
+    margin-bottom: 0.2rem;
+  }
+  .footer__col a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .footer__col a:hover {
+    color: var(--green);
+  }
+  .footer__base {
+    display: flex;
+    justify-content: space-between;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-mute);
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+title: Collision detection
+description: Detect and resolve keyboard shortcut conflicts. Tactile reports competing bindings and resolves them by priority and registration order, like VS Code.
+---
+
+Two rules competing for the same keystroke is a *collision*. Most libraries leave you to discover
+these at runtime. Tactile makes them first-class.
+
+## Detection
+
+At registration, the engine analyzes overlaps. Query them any time:
+
+```ts
+kb.add({ id: 'a', keys: 'mod+k', handler: openPalette });
+kb.add({ id: 'b', keys: 'mod+k', handler: openLink });
+
+kb.getCollisions();
+// [{ keys: 'mod+k', rules: [{ id: 'a', ... }, { id: 'b', ... }] }]
+```
+
+The check is deliberately low-noise: rules only collide when at least one has no `when`, or their
+`when` expressions are identical. Two rules with *different* `when`s are assumed to be intentionally
+scoped and aren't reported.
+
+## Resolution
+
+When multiple rules match a live keystroke and their contexts are all satisfied, the engine picks a
+winner by:
+
+1. **`priority`** — higher wins (default `0`).
+2. **Registration order** — most recently added wins the tie (last-write-wins).
+
+This mirrors VS Code's precedence model.
+
+```ts
+kb.add({ id: 'default', keys: 'mod+k', handler: a });
+kb.add({ id: 'override', keys: 'mod+k', handler: b, priority: 10 }); // b wins
+```
+
+Enable `debug: true` on the engine to log registrations and collisions to the console.

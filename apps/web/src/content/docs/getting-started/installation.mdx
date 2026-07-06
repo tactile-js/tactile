@@ -1,0 +1,21 @@
+---
+title: Installation
+description: Install @tactile-js/core and @tactile-js/react with npm, pnpm, or yarn.
+---
+
+Install the core engine, and the React adapter if you're using React.
+
+```bash
+# framework-agnostic core
+npm install @tactile-js/core
+
+# React hooks (pulls in core)
+npm install @tactile-js/react
+```
+
+`@tactile-js/react` lists `react >= 17` as a peer dependency.
+
+Both packages ship ESM + CJS builds with TypeScript declarations, are tree-shakable
+(`sideEffects: false`), and have zero runtime dependencies beyond the core.
+
+Next: the [Quick start](/getting-started/quick-start/).

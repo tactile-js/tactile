@@ -1,0 +1,17 @@
+# Tactile
+
+> A modern, context-aware keyboard shortcut engine for the web. Layout-aware matching (event.key + event.code, never keyCode), VS Code-style `when` expressions, first-class collision detection, runtime recording, and platform-aware label formatting. A framework-agnostic core (@tactile-js/core) with a thin React adapter (@tactile-js/react).
+
+## Docs
+- [Introduction](https://tactile-js.vercel.app/getting-started/introduction/)
+- [Installation](https://tactile-js.vercel.app/getting-started/installation/)
+- [Quick start](https://tactile-js.vercel.app/getting-started/quick-start/)
+- [Match modes (layout-aware)](https://tactile-js.vercel.app/concepts/matching/)
+- [Context & when expressions](https://tactile-js.vercel.app/concepts/when-expressions/)
+- [Collision detection](https://tactile-js.vercel.app/concepts/collisions/)
+- [React hooks](https://tactile-js.vercel.app/react/overview/)
+
+## Source
+- [GitHub](https://github.com/tactile-js/tactile)
+- [npm: @tactile-js/core](https://www.npmjs.com/package/@tactile-js/core)
+- [npm: @tactile-js/react](https://www.npmjs.com/package/@tactile-js/react)

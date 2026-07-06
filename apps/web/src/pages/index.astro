@@ -1,0 +1,428 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'Tactile — context-aware keyboard shortcuts for the web';
+const description =
+  'A modern keyboard shortcut engine for the web: layout-aware matching, when-expressions, and collision detection. Framework-agnostic core with React hooks.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: 'Tactile',
+  description,
+  codeRepository: 'https://github.com/tactile-js/tactile',
+  programmingLanguage: 'TypeScript',
+  license: 'https://opensource.org/licenses/MIT',
+  author: { '@type': 'Person', name: 'Lohith Mallikarjun' },
+};
+
+const ideas = [
+  {
+    n: '01',
+    label: 'layout-aware',
+    title: 'Correct on every keyboard',
+    body: 'Matches on event.key and event.code — never the deprecated keyCode. ⌘Z lands on the Z key even on a German layout. ? matches the glyph, not a position.',
+    code: `kb.add({
+  id: 'undo',
+  keys: 'mod+z',   // the Z key, any layout
+  handler: undo,
+});`,
+  },
+  {
+    n: '02',
+    label: 'context',
+    title: 'when-expressions, not flags',
+    body: 'Gate any rule with a boolean expression over context keys. The same keystroke does different things in different contexts. Scopes are just sugar over this.',
+    code: `kb.add({
+  keys: 'mod+b',
+  when: "scope == 'editor' && !readOnly",
+  handler: toggleBold,
+});`,
+  },
+  {
+    n: '03',
+    label: 'collisions',
+    title: 'Conflicts, caught early',
+    body: 'Two rules fighting for one keystroke is first-class. Detect them up front; resolve them by priority and registration order, the way VS Code does.',
+    code: `kb.getCollisions();
+// [{ keys: 'mod+k',
+//    rules: ['a', 'b'] }]`,
+  },
+  {
+    n: '04',
+    label: 'core / adapter',
+    title: 'One engine, any framework',
+    body: 'The core talks to a KeyEventSource interface, not the DOM. Fully unit-tested in Node, reusable by React today — Vue and Svelte next.',
+    code: `import { createKeybindingEngine }
+  from '@tactile-js/core';
+
+const kb = createKeybindingEngine();`,
+  },
+];
+---
+
+<Base title={title} description={description} jsonLd={jsonLd}>
+  <Nav />
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <p class="eyebrow">// @tactile-js · keyboard-shortcut engine</p>
+      <h1 class="hero__title">Keyboard shortcuts,<br />done right.</h1>
+      <p class="hero__sub">
+        A context-aware shortcut engine for the web. Layout-aware matching, <code>when</code>-expressions,
+        and collision detection — a framework-agnostic core with React hooks.
+      </p>
+
+      <div class="hero__keys">
+        <span class="keycap keycap--green">⌘</span>
+        <span class="hero__plus">+</span>
+        <span class="keycap keycap--green">K</span>
+        <span class="hero__hint">→ resolves through context, priority, and layout</span>
+      </div>
+
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="/getting-started/introduction/">Get started →</a>
+        <a class="btn" href="/playground/">Playground</a>
+        <a class="btn" href="https://github.com/tactile-js/tactile">GitHub</a>
+      </div>
+
+      <div class="install">
+        <code class="install__code"><span class="install__prompt">$</span> npm i @tactile-js/react</code>
+        <button class="install__copy" data-copy="npm i @tactile-js/react" aria-label="Copy install command">copy</button>
+      </div>
+    </section>
+
+    <!-- Problem -->
+    <section class="problem">
+      <p class="eyebrow">// the problem</p>
+      <h2 class="section__title">Every shortcut library makes the same three mistakes.</h2>
+      <ul class="problem__list">
+        <li>
+          <strong>Deprecated key handling.</strong> Most still rely on <code>keyCode</code>, which breaks
+          on non-US layouts and is on its way out of the platform.
+        </li>
+        <li>
+          <strong>Scopes bolted on.</strong> Context is an afterthought — named scopes at best, never a
+          real expression system.
+        </li>
+        <li>
+          <strong>Collisions ignored.</strong> Two bindings competing for one key? You find out at
+          runtime, in a bug report.
+        </li>
+      </ul>
+    </section>
+
+    <!-- Core ideas -->
+    <section class="ideas">
+      <p class="eyebrow">// what's different</p>
+      <div class="ideas__grid">
+        {
+          ideas.map((idea) => (
+            <article class="card">
+              <div class="card__head">
+                <span class="card__n">{idea.n}</span>
+                <span class="card__label">{idea.label}</span>
+              </div>
+              <h3 class="card__title">{idea.title}</h3>
+              <p class="card__body">{idea.body}</p>
+              <pre class="code"><code>{idea.code}</code></pre>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Adapters -->
+    <section class="adapters">
+      <p class="eyebrow">// adapters</p>
+      <h2 class="section__title">Use it anywhere.</h2>
+      <div class="adapters__row">
+        <div class="adapter adapter--live">
+          <span class="adapter__name">@tactile-js/react</span>
+          <span class="adapter__status">available</span>
+        </div>
+        <div class="adapter adapter--live">
+          <span class="adapter__name">@tactile-js/core</span>
+          <span class="adapter__status">available</span>
+        </div>
+        <div class="adapter">
+          <span class="adapter__name">@tactile-js/vue</span>
+          <span class="adapter__status adapter__status--soon">soon</span>
+        </div>
+        <div class="adapter">
+          <span class="adapter__name">@tactile-js/svelte</span>
+          <span class="adapter__status adapter__status--soon">soon</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>
+
+<script>
+  document.querySelectorAll('.install__copy').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const text = btn.getAttribute('data-copy') ?? '';
+      await navigator.clipboard.writeText(text);
+      const prev = btn.textContent;
+      btn.textContent = 'copied';
+      setTimeout(() => (btn.textContent = prev), 1200);
+    });
+  });
+</script>
+
+<style>
+  main {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--green-dim);
+    letter-spacing: 0.02em;
+    margin: 0 0 1rem;
+  }
+  .section__title {
+    font-family: var(--font-mono);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0 0 2rem;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 4rem 0 5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero__title {
+    font-family: var(--font-mono);
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    margin: 0 0 1.5rem;
+  }
+  .hero__sub {
+    max-width: 40rem;
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    margin: 0 0 2rem;
+  }
+  .hero__sub code {
+    font-family: var(--font-mono);
+    color: var(--green);
+    font-size: 0.95em;
+  }
+  .hero__keys {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 2.5rem;
+    font-size: 1.2rem;
+  }
+  .hero__plus {
+    color: var(--text-mute);
+  }
+  .hero__hint {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-mute);
+    margin-left: 0.75rem;
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: 0.7rem 1.25rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+    transition:
+      border-color 0.15s,
+      background 0.15s;
+  }
+  .btn:hover {
+    border-color: var(--text-dim);
+  }
+  .btn--primary {
+    background: var(--green);
+    color: #05271a;
+    border-color: var(--green);
+    font-weight: 500;
+  }
+  .btn--primary:hover {
+    background: var(--green-bright);
+    border-color: var(--green-bright);
+  }
+  .install {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.6rem 0.6rem 1rem;
+  }
+  .install__code {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .install__prompt {
+    color: var(--green);
+    margin-right: 0.5rem;
+  }
+  .install__copy {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+  }
+  .install__copy:hover {
+    color: var(--green);
+    border-color: var(--green-dim);
+  }
+
+  /* Problem */
+  .problem {
+    padding: 5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .problem__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1.25rem;
+    max-width: 46rem;
+  }
+  .problem__list li {
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--coral);
+    color: var(--text-dim);
+  }
+  .problem__list strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+  code {
+    font-family: var(--font-mono);
+  }
+
+  /* Ideas */
+  .ideas {
+    padding: 5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .ideas__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    transition: border-color 0.15s;
+  }
+  .card:hover {
+    border-color: var(--border-strong);
+  }
+  .card__head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .card__n {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--green);
+  }
+  .card__label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-mute);
+  }
+  .card__title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0 0 0.6rem;
+  }
+  .card__body {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin: 0 0 1.25rem;
+  }
+  .code {
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 0;
+  }
+  .code code {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    white-space: pre;
+  }
+
+  /* Adapters */
+  .adapters {
+    padding: 5rem 0 2rem;
+  }
+  .adapters__row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+  .adapter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+  .adapter--live {
+    border-color: var(--green-dim);
+  }
+  .adapter__name {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+  .adapter__status {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--green);
+  }
+  .adapter__status--soon {
+    color: var(--text-mute);
+  }
+</style>

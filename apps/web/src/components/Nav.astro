@@ -1,0 +1,78 @@
+---
+const links = [
+  { href: '/getting-started/introduction/', label: 'Docs' },
+  { href: '/playground/', label: 'Playground' },
+  { href: '/comparisons/vs-react-hotkeys-hook/', label: 'Compare' },
+];
+const path = Astro.url.pathname;
+---
+
+<nav class="nav">
+  <a class="nav__brand" href="/">tactile<span class="nav__cursor">▊</span></a>
+  <div class="nav__links">
+    {
+      links.map((l) => (
+        <a href={l.href} class:list={['nav__link', { 'is-active': path.startsWith(l.href) }]}>
+          {l.label}
+        </a>
+      ))
+    }
+    <a class="nav__link" href="https://github.com/tactile-js/tactile">GitHub</a>
+    <a class="nav__link nav__link--npm" href="https://www.npmjs.com/package/@tactile-js/core">npm</a>
+  </div>
+</nav>
+
+<style>
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 1.25rem 1.5rem;
+  }
+  .nav__brand {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .nav__cursor {
+    color: var(--green);
+    animation: blink 1.1s step-end infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .nav__link {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav__link:hover,
+  .nav__link.is-active {
+    color: var(--text);
+  }
+  .nav__link--npm:hover {
+    color: var(--green);
+  }
+  @media (max-width: 640px) {
+    .nav__links {
+      gap: 1rem;
+    }
+    .nav__link--npm {
+      display: none;
+    }
+  }
+</style>

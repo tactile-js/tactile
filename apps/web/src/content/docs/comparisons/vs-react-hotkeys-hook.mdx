@@ -1,0 +1,32 @@
+---
+title: Tactile vs react-hotkeys-hook
+description: How Tactile compares to react-hotkeys-hook for React keyboard shortcuts — layout-aware matching, when-expressions, collision detection, and a framework-agnostic core.
+---
+
+[react-hotkeys-hook](https://www.npmjs.com/package/react-hotkeys-hook) is the de-facto React hotkeys
+hook, and it's good at what it does. Here's where Tactile differs.
+
+| | Tactile | react-hotkeys-hook |
+| --- | --- | --- |
+| Key model | `event.key` + `event.code`, layout-aware | string parsing, `keyCode`-era assumptions |
+| Context gating | `when` expressions (`scope == 'editor' && !readOnly`) | named scopes |
+| Collision detection | first-class (`getCollisions()`) | not built in |
+| Core | framework-agnostic, Node-testable | React-coupled |
+| Introspection | `getKeymap()` with formatted labels | limited |
+| Recording | built in (`useShortcutRecorder`) | `useRecordHotkeys` |
+
+## When to choose Tactile
+
+- You need **the same shortcut to behave differently by context** and want richer gating than flat
+  scopes — `when` expressions compose (`&&`, `||`, `!`, `==`, `in`).
+- You care about **international keyboard layouts** and don't want `keyCode` surprises.
+- You want to **detect conflicts** between shortcuts instead of discovering them at runtime.
+- You want shortcuts **outside React too** (vanilla, Vue, Electron) sharing one engine.
+
+## When react-hotkeys-hook is a fine choice
+
+- A small React app with a handful of global shortcuts and no context nuance.
+- You're already using it and it works — there's no need to migrate for its own sake.
+
+Both are small and dependency-free. If you're starting fresh and expect your shortcut needs to grow —
+palettes, modes, per-scope bindings — Tactile's model scales with you.

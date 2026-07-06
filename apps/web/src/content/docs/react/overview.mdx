@@ -1,0 +1,62 @@
+---
+title: React hooks
+description: Tactile's React adapter — KeybindProvider, useShortcut, useScope, useShortcutRecorder, and useKeymap for building keyboard shortcuts and command palettes in React.
+---
+
+`@tactile-js/react` is a thin layer over the core — it manages engine lifecycle and binding
+registration around the component lifecycle, and re-exports the core so you can import from one place.
+
+## Setup
+
+```tsx
+import { KeybindProvider } from '@tactile-js/react';
+
+<KeybindProvider options={{ defaultMatch: 'hybrid' }}>
+  <App />
+</KeybindProvider>;
+```
+
+## `useShortcut`
+
+Registers a shortcut for the component's lifetime (auto add/remove). The handler is read through a
+ref, so it always sees current state without re-registering.
+
+```tsx
+useShortcut({
+  id: 'palette.open',
+  keys: 'mod+k',
+  when: "scope == 'global'",
+  handler: () => setOpen((o) => !o),
+});
+```
+
+## `useScope`
+
+Imperative controls over context keys and scopes.
+
+```tsx
+const { set, setScope, enableScope, disableScope, toggleScope } = useScope();
+
+setScope('editor');        // gates: when "scope == 'editor'"
+enableScope('terminal');   // gates: when "scope.terminal"
+```
+
+## `useShortcutRecorder`
+
+The primitive behind a "press a key to rebind" settings field.
+
+```tsx
+const { isRecording, combo, start, stop } = useShortcutRecorder();
+// combo -> { binding: 'ctrl+shift+k', label: '⌃⇧K' }
+```
+
+## `useKeymap`
+
+The live keymap, for building a shortcuts help dialog that can't drift from what's registered.
+
+```tsx
+const keymap = useKeymap();                 // all rules, with formatted labels
+const active = useKeymap({ forContext: true }); // only rules active right now
+```
+
+Try all of these live in the [playground](/playground/).

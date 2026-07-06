@@ -1,0 +1,39 @@
+---
+/**
+ * Per-page SEO head: title, description, canonical, Open Graph, Twitter card, and
+ * optional JSON-LD structured data. Canonical/OG URLs derive from `site`.
+ */
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: 'website' | 'article';
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, image = '/og.png', type = 'website', jsonLd } = Astro.props;
+const site = Astro.site ?? new URL('https://tactile-js.vercel.app');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(image, site).href;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:site_name" content="Tactile" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<meta name="theme-color" content="#0a0b0c" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+{jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

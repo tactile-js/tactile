@@ -1,0 +1,63 @@
+---
+title: Quick start
+description: Register your first keyboard shortcut in React or vanilla JavaScript with Tactile in under a minute.
+---
+
+## React
+
+Wrap your app once, then register shortcuts anywhere with `useShortcut`.
+
+```tsx
+// app.tsx
+import { KeybindProvider } from '@tactile-js/react';
+
+export function App() {
+  return (
+    <KeybindProvider>
+      <Editor />
+    </KeybindProvider>
+  );
+}
+```
+
+```tsx
+// editor.tsx
+import { useShortcut } from '@tactile-js/react';
+
+function Editor() {
+  useShortcut({
+    id: 'palette.open',
+    keys: 'mod+k', // ⌘K on macOS, Ctrl+K elsewhere
+    description: 'Open command palette',
+    handler: () => openPalette(),
+  });
+
+  return <textarea />;
+}
+```
+
+The handler is read through a ref, so passing a fresh closure every render does **not** re-register
+the binding — it always sees current state. No dependency-array juggling.
+
+## Vanilla / framework-agnostic
+
+```ts
+import { createKeybindingEngine } from '@tactile-js/core';
+
+const kb = createKeybindingEngine();
+
+const off = kb.add({
+  id: 'file.save',
+  keys: 'mod+s',
+  when: "scope == 'editor'",
+  handler: () => save(),
+});
+
+kb.context.set('scope', 'editor'); // gate rules on the active scope
+
+off();          // unregister this rule
+kb.dispose();   // detach all listeners
+```
+
+That's it. From here, the interesting parts are [Match modes](/concepts/matching/) (how Tactile stays
+correct across keyboard layouts) and [`when` expressions](/concepts/when-expressions/).

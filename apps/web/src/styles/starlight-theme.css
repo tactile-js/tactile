@@ -244,6 +244,13 @@
   .right-sidebar {
     width: 15rem;
   }
+  /* The inner TOC container is sized from --sl-sidebar-width, which collapses
+     to 0rem when the left sidebar is closed — starving the rail. Fill the
+     pinned rail instead so the TOC is stable in both sidebar states. */
+  .right-sidebar-panel .sl-container {
+    width: auto;
+    max-width: none;
+  }
 }
 .right-sidebar {
   padding-top: 1.5rem;

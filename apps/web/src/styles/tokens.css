@@ -33,6 +33,33 @@
   --maxw: 1120px;
 }
 
+/*
+ * Light-mode token values. Only docs pages set data-theme (via Starlight's
+ * toggle); the bespoke landing/playground pages stay pitch black by design.
+ */
+:root[data-theme='light'] {
+  --bg: #ffffff;
+  --bg-deep: #f6f8f7;
+  --surface: #fafbfa;
+  --surface-2: #eef1ef;
+  --border: rgba(0, 0, 0, 0.09);
+  --border-strong: rgba(0, 0, 0, 0.16);
+
+  --text: #1a201d;
+  --text-dim: #454d4a;
+  --text-mute: #6a7370;
+
+  --green: #0f6e56;
+  --green-bright: #0c5a46;
+  --green-dim: #7ac7a8;
+  --green-tint: rgba(15, 110, 86, 0.08);
+
+  --amber: #854f0b;
+  --blue: #185fa5;
+  --coral: #993c1d;
+  --purple: #534ab7;
+}
+
 /* Keycap — the signature motif. A physical-looking key for bindings. */
 .keycap {
   display: inline-flex;

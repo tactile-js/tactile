@@ -1,0 +1,190 @@
+---
+/**
+ * Sidebar override: the docs shell's command center. Hosts the brand (the
+ * header is gone on desktop), global search, the nav (default Starlight
+ * sidebar), and a footer row with social links + the theme switch. A toggle
+ * collapses it to a slim icon rail (state persisted in localStorage).
+ */
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import Search from '@astrojs/starlight/components/Search.astro';
+import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
+import ThemeSwitch from './ThemeSwitch.astro';
+---
+
+<div class="tj-side">
+  <div class="tj-top">
+    <a class="tj-brand" href="/" aria-label="Tactile home">
+      <span class="tj-brand__full">tactile<span aria-hidden="true">▊</span></span>
+      <span class="tj-brand__min" aria-hidden="true">t</span>
+    </a>
+    <button class="tj-collapse" data-tj-collapse aria-label="Toggle sidebar" title="Toggle sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+        <line x1="9" y1="4" x2="9" y2="20"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div class="tj-search"><Search /></div>
+
+  <div class="tj-nav">
+    <Default><slot /></Default>
+  </div>
+
+  <div class="tj-foot">
+    <SocialIcons />
+    <ThemeSwitch />
+  </div>
+</div>
+
+<script>
+  const KEY = 'tj-sidebar';
+  const root = document.documentElement;
+
+  document.querySelectorAll('[data-tj-collapse]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const collapsed = root.hasAttribute('data-tj-sidebar');
+      if (collapsed) root.removeAttribute('data-tj-sidebar');
+      else root.setAttribute('data-tj-sidebar', '');
+      try {
+        localStorage.setItem(KEY, collapsed ? '0' : '1');
+      } catch {}
+    });
+  });
+</script>
+
+<style>
+  .tj-side {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: 0.75rem;
+  }
+  .tj-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .tj-brand {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  .tj-brand__full span {
+    color: var(--sl-color-text-accent);
+  }
+  .tj-brand__min {
+    display: none;
+    color: var(--sl-color-text-accent);
+  }
+  .tj-collapse {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    color: var(--sl-color-gray-3);
+    cursor: pointer;
+  }
+  .tj-collapse svg {
+    width: 17px;
+    height: 17px;
+  }
+  .tj-collapse:hover {
+    color: var(--sl-color-white);
+    border-color: var(--sl-color-hairline);
+    background: var(--sl-color-gray-6);
+  }
+  .tj-nav {
+    flex: 1;
+    min-height: 0;
+  }
+  .tj-foot {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--sl-color-hairline);
+  }
+  .tj-foot :global(a) {
+    color: var(--sl-color-gray-3);
+  }
+  .tj-foot :global(a:hover) {
+    color: var(--sl-color-text-accent);
+  }
+
+  /* Desktop: collapse button + footer become available; mobile drawer keeps
+     Starlight's own MobileMenuFooter (which uses our ThemeSwitch override). */
+  @media (min-width: 50rem) {
+    .tj-collapse {
+      display: inline-flex;
+    }
+    .tj-foot {
+      display: flex;
+    }
+    /* Rail mode: only brand glyph + toggle remain visible. */
+    :global(html[data-tj-sidebar]) .tj-top {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    :global(html[data-tj-sidebar]) .tj-brand__full {
+      display: none;
+    }
+    :global(html[data-tj-sidebar]) .tj-brand__min {
+      display: inline;
+    }
+    :global(html[data-tj-sidebar]) .tj-search,
+    :global(html[data-tj-sidebar]) .tj-nav,
+    :global(html[data-tj-sidebar]) .tj-foot {
+      display: none;
+    }
+    :global(html[data-tj-sidebar]) .tj-collapse svg {
+      transform: scaleX(-1);
+    }
+  }
+
+  /* Make the Pagefind search button fill the sidebar width. */
+  .tj-search :global(site-search) {
+    display: block;
+  }
+  .tj-search :global(button[data-open-modal]) {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    height: 2.2rem;
+    font-size: 0.82rem;
+    border-radius: 8px;
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-hairline);
+    color: var(--sl-color-gray-2);
+  }
+  .tj-search :global(button[data-open-modal]:hover) {
+    border-color: var(--sl-color-gray-4);
+  }
+  .tj-search :global(button[data-open-modal] kbd) {
+    margin-inline-start: auto;
+    background: var(--sl-color-gray-7);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tj-collapse,
+    .tj-search :global(button[data-open-modal]) {
+      transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease,
+        color 0.15s ease;
+    }
+    .tj-collapse svg {
+      transition: transform 0.25s ease;
+    }
+  }
+</style>

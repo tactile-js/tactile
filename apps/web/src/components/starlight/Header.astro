@@ -1,0 +1,41 @@
+---
+/**
+ * Header override. On desktop the header is removed entirely (starlight-theme.css
+ * sets --sl-nav-height: 0 and hides .header) — brand, search, and theme controls
+ * live in the sidebar instead. On mobile this slim brand bar remains so the
+ * hamburger (rendered by PageFrame) has a home.
+ */
+---
+
+{/* Restore the sidebar collapsed state before first paint to avoid a flash. */}
+<script is:inline>
+  try {
+    if (localStorage.getItem('tj-sidebar') === '1') {
+      document.documentElement.setAttribute('data-tj-sidebar', '');
+    }
+  } catch {}
+</script>
+
+<a class="tj-mobile-brand" href="/">tactile<span aria-hidden="true">▊</span></a>
+
+<style>
+  .tj-mobile-brand {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  .tj-mobile-brand span {
+    color: var(--sl-color-text-accent);
+  }
+  @media (min-width: 50rem) {
+    .tj-mobile-brand {
+      display: none;
+    }
+  }
+</style>

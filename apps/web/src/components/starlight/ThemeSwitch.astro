@@ -1,0 +1,115 @@
+---
+/**
+ * ThemeSelect override: a two-state light/dark switch instead of the dropdown.
+ * Registered as the ThemeSelect component, so Starlight's mobile menu footer
+ * picks it up automatically; the sidebar renders it directly for desktop.
+ */
+---
+
+<button type="button" class="tj-theme" role="switch" aria-checked="true" aria-label="Dark mode">
+  <span class="tj-theme__track" aria-hidden="true">
+    <svg class="tj-theme__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"></path>
+    </svg>
+    <svg class="tj-theme__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+    </svg>
+    <span class="tj-theme__thumb"></span>
+  </span>
+</button>
+
+<script>
+  const KEY = 'starlight-theme';
+
+  const current = (): 'dark' | 'light' =>
+    document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  function apply(theme: 'dark' | 'light') {
+    // Same mechanism as Starlight's own ThemeSelect: set the attribute and
+    // persist the choice, then let the provider refresh any other pickers.
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(KEY, theme);
+    } catch {}
+    (window as any).StarlightThemeProvider?.updatePickers?.(theme);
+  }
+
+  function syncAll() {
+    const dark = current() === 'dark';
+    document
+      .querySelectorAll('.tj-theme')
+      .forEach((btn) => btn.setAttribute('aria-checked', String(dark)));
+  }
+
+  document.querySelectorAll('.tj-theme').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      apply(current() === 'dark' ? 'light' : 'dark');
+      syncAll();
+    });
+  });
+
+  // Stay in sync if the theme changes from anywhere else.
+  new MutationObserver(syncAll).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+  syncAll();
+</script>
+
+<style>
+  .tj-theme {
+    display: inline-flex;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .tj-theme__track {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 46px;
+    height: 24px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-hairline);
+    box-sizing: border-box;
+  }
+  .tj-theme:hover .tj-theme__track {
+    border-color: var(--sl-color-gray-4);
+  }
+  .tj-theme:focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+  .tj-theme__icon {
+    width: 12px;
+    height: 12px;
+    color: var(--sl-color-gray-3);
+    z-index: 1;
+  }
+  .tj-theme__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--sl-color-text-accent);
+  }
+  .tj-theme[aria-checked='true'] .tj-theme__thumb {
+    transform: translateX(22px);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tj-theme__thumb {
+      transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+    .tj-theme__track {
+      transition: border-color 0.15s ease;
+    }
+  }
+</style>

@@ -1,13 +1,16 @@
 /*
- * Map Starlight's theme variables onto the Tactile palette so the docs match the
- * bespoke landing. Dark-only (pitch black + green).
+ * Map Starlight's theme variables onto the Tactile palette.
+ * Dark is the brand default (pitch black + green); light is a paper-white
+ * companion. Everything is scoped to [data-theme] so Starlight's toggle works.
  */
 :root {
   --sl-font: var(--font-sans);
   --sl-font-mono: var(--font-mono);
+  /* Slimmer chrome: narrower sidebars, calmer navigation. */
+  --sl-sidebar-width: 17rem;
 }
 
-:root,
+/* ── Dark theme (brand default) ─────────────────────────────────── */
 :root[data-theme='dark'] {
   --sl-color-accent-low: #103b2a;
   --sl-color-accent: #2c8f66;
@@ -29,17 +32,71 @@
   --sl-color-bg-inline-code: #171a1d;
   --sl-color-hairline: rgba(255, 255, 255, 0.08);
   --sl-color-hairline-light: rgba(255, 255, 255, 0.08);
-  --sl-color-text-accent: var(--green);
+  --sl-color-text-accent: #48d597;
+
+  /* Semantic ramps → on-brand asides (note/tip/caution/danger). */
+  --sl-color-blue-low: #0e1726;
+  --sl-color-blue: #5b9df9;
+  --sl-color-blue-high: #a8c7fa;
+  --sl-color-green-low: #0d2018;
+  --sl-color-green: #48d597;
+  --sl-color-green-high: #7ee6b3;
+  --sl-color-orange-low: #241b09;
+  --sl-color-orange: #f0b429;
+  --sl-color-orange-high: #f7d070;
+  --sl-color-red-low: #260f0a;
+  --sl-color-red: #e8664e;
+  --sl-color-red-high: #f0997b;
+  --sl-color-purple-low: #171226;
+  --sl-color-purple: #9b87f5;
+  --sl-color-purple-high: #c4b5fd;
 }
 
-/* Force dark: this is a pitch-black brand, no light mode. */
+/* ── Light theme ────────────────────────────────────────────────── */
 :root[data-theme='light'] {
-  color-scheme: dark;
+  --sl-color-accent-low: #dcf3e9;
+  --sl-color-accent: #0f6e56;
+  --sl-color-accent-high: #085041;
+
+  /* In light mode Starlight inverts the scale: white = strongest text. */
+  --sl-color-white: #1a201d;
+  --sl-color-gray-1: #2c3330;
+  --sl-color-gray-2: #454d4a;
+  --sl-color-gray-3: #6a7370;
+  --sl-color-gray-4: #9aa3a0;
+  --sl-color-gray-5: #ccd2cf;
+  --sl-color-gray-6: #eef1ef;
+  --sl-color-gray-7: #f6f8f7;
+  --sl-color-black: #ffffff;
+
+  --sl-color-bg: #ffffff;
+  --sl-color-bg-nav: rgba(255, 255, 255, 0.85);
+  --sl-color-bg-sidebar: #fafbfa;
+  --sl-color-bg-inline-code: #eef1ef;
+  --sl-color-hairline: rgba(0, 0, 0, 0.09);
+  --sl-color-hairline-light: rgba(0, 0, 0, 0.07);
+  --sl-color-text-accent: #0f6e56;
+
+  --sl-color-blue-low: #e6f1fb;
+  --sl-color-blue: #185fa5;
+  --sl-color-blue-high: #0c447c;
+  --sl-color-green-low: #e1f5ee;
+  --sl-color-green: #0f6e56;
+  --sl-color-green-high: #085041;
+  --sl-color-orange-low: #faeeda;
+  --sl-color-orange: #ba7517;
+  --sl-color-orange-high: #633806;
+  --sl-color-red-low: #faece7;
+  --sl-color-red: #993c1d;
+  --sl-color-red-high: #712b13;
+  --sl-color-purple-low: #eeedfe;
+  --sl-color-purple: #534ab7;
+  --sl-color-purple-high: #3c3489;
 }
 
-/* Mono-forward headings and site title, TUI flavor. */
+/* ── Typography: mono-forward headings, TUI flavor ──────────────── */
 .site-title,
-site-title a {
+.site-title a {
   font-family: var(--font-mono);
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -51,13 +108,12 @@ site-title a {
   letter-spacing: -0.02em;
 }
 
-/* Links pick up the signature green. */
 .sl-markdown-content a:not(:where(.not-content *)) {
-  color: var(--green);
+  color: var(--sl-color-text-accent);
   text-underline-offset: 3px;
 }
 
-/* Keycap styling for inline <kbd> inside docs. */
+/* Keycap styling for inline <kbd>, theme-aware via tokens. */
 .sl-markdown-content kbd {
   font-family: var(--font-mono);
   font-size: 0.8em;
@@ -67,4 +123,128 @@ site-title a {
   border: 1px solid var(--border-strong);
   border-bottom-width: 3px;
   border-radius: 6px;
+}
+
+/* ── Docs shell: no header on desktop ───────────────────────────── */
+/* Brand, search, and theme controls live in the sidebar (see the Sidebar
+   override). Mobile keeps a slim bar so the hamburger has a home. */
+@media (min-width: 50rem) {
+  :root {
+    --sl-nav-height: 0rem;
+  }
+  .page > .header {
+    display: none;
+  }
+}
+
+/* ── Desktop sidebar collapse (icon rail) ───────────────────────── */
+@media (min-width: 50rem) {
+  html[data-tj-sidebar] {
+    --sl-sidebar-width: 3.5rem;
+  }
+  html[data-tj-sidebar] .sidebar-pane .sidebar-content {
+    align-items: center;
+    padding-inline: 0.5rem;
+    overflow: hidden;
+  }
+}
+@media (min-width: 50rem) and (prefers-reduced-motion: no-preference) {
+  .sidebar-pane {
+    transition: width 0.25s ease;
+  }
+  .main-frame {
+    transition: padding-inline-start 0.25s ease;
+  }
+}
+
+/* ── Left sidebar: quiet, compact, collapsible groups ───────────── */
+.sidebar-pane {
+  font-size: 0.9rem;
+}
+.sidebar-pane .group-label span {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--sl-color-gray-3);
+}
+.sidebar-pane summary {
+  padding-block: 0.35rem;
+}
+.sidebar-pane a {
+  font-size: 0.85rem;
+  padding-block: 0.25rem;
+}
+.sidebar-pane a[aria-current='page'] {
+  background: color-mix(in srgb, var(--sl-color-text-accent) 12%, transparent);
+  color: var(--sl-color-text-accent);
+  font-weight: 500;
+}
+
+/* ── Sidebar micro-animations ───────────────────────────────────── */
+/* Animated <details> disclosure: interpolate-size + ::details-content is the
+   modern pure-CSS accordion (Chromium); other engines fall back to instant. */
+.sidebar-pane {
+  interpolate-size: allow-keywords;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sidebar-pane details::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition:
+      block-size 0.25s ease,
+      content-visibility 0.25s allow-discrete;
+  }
+  .sidebar-pane details[open]::details-content {
+    block-size: auto;
+  }
+  /* Caret rotates smoothly on open/close. */
+  .sidebar-pane summary svg.caret {
+    transition: transform 0.2s ease;
+  }
+  /* Links: color/background ease + a subtle nudge on hover. */
+  .sidebar-pane a {
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      translate 0.15s ease;
+  }
+  .sidebar-pane a:hover:not([aria-current='page']) {
+    translate: 2px 0;
+  }
+  /* Group labels brighten gently on hover. */
+  .sidebar-pane .group-label span {
+    transition: color 0.15s ease;
+  }
+  .sidebar-pane summary:hover .group-label span {
+    color: var(--sl-color-white);
+  }
+  /* TOC links ease between states too. */
+  starlight-toc a {
+    transition: color 0.15s ease;
+  }
+}
+
+/* ── Right "On this page" rail: half the visual weight ──────────── */
+@media (min-width: 72rem) {
+  .right-sidebar-container {
+    width: 14rem;
+  }
+}
+.right-sidebar {
+  padding-top: 1.5rem;
+}
+.right-sidebar-panel h2 {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sl-color-gray-3);
+}
+.right-sidebar-panel starlight-toc a,
+starlight-toc a {
+  font-size: 0.8rem;
+  padding-block: 0.15rem;
 }

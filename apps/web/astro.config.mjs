@@ -23,6 +23,14 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/tactile-js/tactile/edit/main/apps/web/',
       },
+      // Custom docs shell: no desktop header (brand/search/theme live in the
+      // sidebar), collapsible sidebar rail, and a light/dark switch instead of
+      // the three-way dropdown.
+      components: {
+        Header: './src/components/starlight/Header.astro',
+        Sidebar: './src/components/starlight/Sidebar.astro',
+        ThemeSelect: './src/components/starlight/ThemeSwitch.astro',
+      },
       customCss: [
         '@fontsource-variable/geist/index.css',
         '@fontsource-variable/geist-mono/index.css',
@@ -43,11 +51,35 @@ export default defineConfig({
           },
         },
       },
+      // Groups are collapsed by default (Starlight auto-expands the group that
+      // contains the current page, so context is never lost).
       sidebar: [
-        { label: 'Getting started', items: [{ autogenerate: { directory: 'getting-started' } }] },
-        { label: 'Core concepts', items: [{ autogenerate: { directory: 'concepts' } }] },
-        { label: 'React', items: [{ autogenerate: { directory: 'react' } }] },
-        { label: 'Comparisons', items: [{ autogenerate: { directory: 'comparisons' } }] },
+        {
+          label: 'Getting started',
+          collapsed: true,
+          items: [{ autogenerate: { directory: 'getting-started' } }],
+        },
+        { label: 'Core API', collapsed: true, items: [{ autogenerate: { directory: 'core' } }] },
+        {
+          label: 'Core concepts',
+          collapsed: true,
+          items: [{ autogenerate: { directory: 'concepts' } }],
+        },
+        { label: 'Guides', collapsed: true, items: [{ autogenerate: { directory: 'guides' } }] },
+        { label: 'React', collapsed: true, items: [{ autogenerate: { directory: 'react' } }] },
+        {
+          label: 'Comparisons',
+          collapsed: true,
+          items: [{ autogenerate: { directory: 'comparisons' } }],
+        },
+        {
+          label: 'Resources',
+          collapsed: true,
+          items: [
+            { label: 'Playground', link: '/playground/' },
+            { label: 'Launch blog post', link: '/blog/introducing-tactile/' },
+          ],
+        },
       ],
       // Reuse Starlight's built-in sitemap-friendly head; we add extra SEO on the
       // bespoke landing/playground pages via our own <Seo> component.

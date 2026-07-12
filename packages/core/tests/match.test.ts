@@ -25,6 +25,12 @@ describe('matchChord — hybrid mode (default)', () => {
     expect(matchChord(chord('up'), event, 'hybrid')).toBe(true);
   });
 
+  it('falls back to the character when the event has no code (synthetic/IME events)', () => {
+    const event = keyEvent({ key: 'k', code: '', metaKey: true });
+    expect(matchChord(chord('meta+k'), event, 'hybrid')).toBe(true);
+    expect(matchChord(chord('meta+j'), event, 'hybrid')).toBe(false);
+  });
+
   it('enforces exact modifier state for non-symbol keys', () => {
     const noShift = keyEvent({ key: 'a', code: 'KeyA' });
     expect(matchChord(chord('a'), noShift, 'hybrid')).toBe(true);

@@ -201,8 +201,10 @@ press({ key: 's', code: 'KeyS', metaKey: true, ctrlKey: false, shiftKey: false, 
 
 ## Input fields
 
-Three strategies — default ignore, per-shortcut `when` gating, and selective passthrough — with code
-for each in [Engine options → `ignore`](/core/engine-options/#ignore-event-keyevent--boolean).
+For the palette-must-open-anywhere case, set `enableInFormFields: true` on that rule and you're
+done. All strategies — the per-rule flag, default ignore, per-shortcut `when` gating, and selective
+passthrough — with code for each in
+[Engine options → `ignore`](/core/engine-options/#ignore-event-keyevent--boolean).
 
 ## Handler: skip preventDefault
 

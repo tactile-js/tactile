@@ -85,7 +85,27 @@ import { createKeybindingEngine, defaultIgnore } from '@tactile-js/core';
 const kb = createKeybindingEngine({ ignore: () => false });
 ```
 
-### Allow specific shortcuts in inputs
+### Allow one shortcut in inputs (per-rule)
+
+The common case — a command palette that must open from anywhere, including text fields — doesn't
+need a custom predicate. Opt the rule in:
+
+```ts
+kb.add({
+  id: 'palette',
+  keys: 'mod+k',
+  enableInFormFields: true,
+  handler: openPalette,
+});
+```
+
+Everything else stays paused while the user types. Two guardrails are built in: sequences never
+fire inside form fields (they're indistinguishable from typing), and `debug: true` warns if you set
+this on a binding without a ctrl/alt/meta modifier, since plain keys would collide with text entry.
+
+### Allow shortcuts by predicate (engine-wide)
+
+For broader policies, replace the predicate:
 
 ```ts
 createKeybindingEngine({

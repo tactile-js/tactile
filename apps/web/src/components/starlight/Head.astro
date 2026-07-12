@@ -79,7 +79,7 @@ const faq =
             name: 'How do I stop shortcuts from firing while the user types in an input?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'By default Tactile ignores key events from input, textarea, select, and contenteditable elements. The ignore engine option lets you allow specific shortcuts through or disable the behavior entirely.',
+              text: "By default Tactile ignores key events from input, textarea, select, and contenteditable elements. To let a specific shortcut through anyway, like a command palette's mod+k, set enableInFormFields: true on that one rule, or replace the engine-wide ignore predicate for broader policies.",
             },
           },
           {

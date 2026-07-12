@@ -4,6 +4,7 @@ import { KeybindingRegistry } from '../registry/registry.js';
 import type { RegisteredRule } from '../registry/registry.js';
 import { detectCollisions } from '../registry/collisions.js';
 import { formatBinding } from '../keys/format.js';
+import { parseBindings } from '../keys/parse.js';
 import { detectPlatform } from '../keys/platform.js';
 import { evaluateWhen } from '../context/whenEval.js';
 import { recordShortcut } from '../record/recorder.js';
@@ -100,6 +101,18 @@ export function createKeybindingEngine(options: EngineOptions = {}): KeybindingE
           if (c.rules.some((r) => r.id === rule.id)) {
             console.warn(
               `[keybind] collision on "${c.keys}": ${c.rules.map((r) => r.id).join(' vs ')}`,
+            );
+          }
+        }
+        if (rule.enableInFormFields) {
+          // Plain keys firing while the user types are a UX hazard; this option
+          // is meant for modifier chords (ctrl/alt/meta — shift alone is typing).
+          const unmodified = parseBindings(rule.keys, platform).some(({ chords }) =>
+            chords.some((c) => !c.ctrl && !c.alt && !c.meta),
+          );
+          if (unmodified) {
+            console.warn(
+              `[keybind] ${rule.id} has enableInFormFields on a binding without ctrl/alt/meta — it will fire while users type`,
             );
           }
         }

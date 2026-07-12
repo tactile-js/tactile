@@ -28,7 +28,10 @@ function matchKeyToken(token: string, event: KeyEvent, mode: MatchMode): boolean
   if (effectiveMode(token, mode) === 'physical') {
     const code = tokenToCode(token);
     // Symbols have no stable code; fall back to the character. Documented caveat.
-    if (code) return event.code === code;
+    // Same fallback when the *event* carries no position data — synthetic events,
+    // some IMEs, and virtual keyboards dispatch with an empty `code`, and matching
+    // the character then beats matching nothing.
+    if (code && event.code) return event.code === code;
     return normalizeEventKey(event.key) === token;
   }
   return normalizeEventKey(event.key) === token;

@@ -38,21 +38,32 @@ export class Dispatcher {
   }
 
   handle(event: KeyEvent, type: EventType): void {
-    if (this.deps.ignore(event)) return;
+    // Inside a form field, most rules are skipped — but rules that opted in via
+    // `enableInFormFields` (a command palette's mod+k, say) still fire. Typing
+    // never feeds the sequence buffer, so entering "gi" in a search box can't
+    // arm a `g i` navigation for the moment focus leaves the field.
+    const inFormField = this.deps.ignore(event);
 
     // A held key repeats keydown; don't let that flood the sequence buffer.
     const isRepeat = type === 'keydown' && event.repeat === true;
-    if (!isRepeat) this.appendToBuffer(event);
+    if (!inFormField && !isRepeat) this.appendToBuffer(event);
 
     const ctx = this.deps.context.snapshot();
     const candidates: Candidate[] = [];
 
     for (const registered of this.deps.registry.list()) {
       if (registered.eventType !== type) continue;
+      if (inFormField && !registered.rule.enableInFormFields) continue;
       if (registered.when && !evaluateWhen(registered.when, ctx)) continue;
 
       for (const binding of registered.bindings) {
-        if (this.sequenceMatchesTail(binding, registered)) {
+        if (inFormField) {
+          // While typing, only single-stroke chords may match — sequences are
+          // indistinguishable from text entry, so they stay off in form fields.
+          if (binding.chords.length === 1 && matchChord(binding.chords[0], event, registered.match)) {
+            candidates.push({ registered, binding });
+          }
+        } else if (this.sequenceMatchesTail(binding, registered)) {
           candidates.push({ registered, binding });
         }
       }

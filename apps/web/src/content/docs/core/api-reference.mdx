@@ -135,6 +135,7 @@ Detach all listeners and reset internal state.
 | `group` | `string` | — | Category for help UIs. |
 | `description` | `string` | — | Human-readable label for help UIs. |
 | `match` | `'hybrid' \| 'physical' \| 'logical'` | engine default | Per-rule match mode override. |
+| `enableInFormFields` | `boolean` | `false` | Fire even while typing in inputs/textareas/contenteditable. Chords only — see [Engine options → `ignore`](/core/engine-options/#allow-one-shortcut-in-inputs-per-rule). |
 | `preventDefault` | `boolean \| (event) => boolean` | `true` | Whether to call `preventDefault` on match. |
 | `eventType` | `'keydown' \| 'keyup'` | `'keydown'` | Which event to listen on. |
 

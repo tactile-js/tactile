@@ -237,6 +237,8 @@ function Inner() {
     keys: 'mod+k',
     group: 'Navigation',
     description: 'Command palette',
+    // The Oxide-issue fix: the palette opens even mid-typing in the title field.
+    enableInFormFields: true,
     handler: () => setPaletteOpen((o) => !o),
   });
   useShortcut({
@@ -406,7 +408,7 @@ function Inner() {
             <span>
               scope: <b className={scope === 'editor' ? 'pgx-accent' : ''}>{scope}</b>
             </span>
-            {typing && <span className="pgx-status__typing">typing — shortcuts paused</span>}
+            {typing && <span className="pgx-status__typing">typing — shortcuts paused, except {engine.format('mod+k')}</span>}
             {seqHint && <span className="pgx-accent">{seqHint}</span>}
             <span className="pgx-status__save">
               {saveState === 'saved' ? <span className="pgx-accent">Saved just now</span> : 'Saved'}
@@ -452,7 +454,7 @@ function Inner() {
             </div>
             <div>
               <dt>shortcuts</dt>
-              <dd>{typing ? 'paused (input)' : 'listening'}</dd>
+              <dd>{typing ? 'paused — opted-in rules only' : 'listening'}</dd>
             </div>
           </dl>
         </section>

@@ -103,14 +103,57 @@ describe('engine — sequences', () => {
 });
 
 describe('engine — ignore predicate', () => {
+  const input = { tagName: 'INPUT' } as unknown as EventTarget;
+
   it('skips shortcuts while typing in a text field', () => {
     const { engine, emit } = setup();
     const handler = vi.fn();
     engine.add({ id: 'save', keys: 'ctrl+s', handler });
 
-    const target = { tagName: 'INPUT' } as unknown as EventTarget;
-    emit('keydown', keyEvent({ key: 's', code: 'KeyS', ctrlKey: true, target }));
+    emit('keydown', keyEvent({ key: 's', code: 'KeyS', ctrlKey: true, target: input }));
     expect(handler).not.toHaveBeenCalled();
+  });
+
+  it('fires opted-in rules inside form fields and prevents the browser default', () => {
+    const { engine, emit } = setup();
+    const palette = vi.fn();
+    const save = vi.fn();
+    engine.add({ id: 'palette', keys: 'ctrl+k', enableInFormFields: true, handler: palette });
+    engine.add({ id: 'save', keys: 'ctrl+s', handler: save });
+
+    const event = keyEvent({ key: 'k', code: 'KeyK', ctrlKey: true, target: input, preventDefault: vi.fn() });
+    emit('keydown', event);
+    emit('keydown', keyEvent({ key: 's', code: 'KeyS', ctrlKey: true, target: input }));
+
+    expect(palette).toHaveBeenCalledOnce();
+    expect(event.preventDefault).toHaveBeenCalledOnce();
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it('never fires sequences inside form fields, even when opted in', () => {
+    const { engine, emit } = setup();
+    const handler = vi.fn();
+    engine.add({ id: 'goInbox', keys: 'g i', enableInFormFields: true, handler });
+
+    emit('keydown', keyEvent({ key: 'g', code: 'KeyG', target: input }));
+    emit('keydown', keyEvent({ key: 'i', code: 'KeyI', target: input }));
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it('typing in a field does not arm sequences for after focus leaves', () => {
+    const { engine, emit } = setup();
+    const handler = vi.fn();
+    engine.add({ id: 'goInbox', keys: 'g i', handler });
+
+    // "g" typed into the input, then "i" pressed outside — must not complete g i.
+    emit('keydown', keyEvent({ key: 'g', code: 'KeyG', target: input }));
+    emit('keydown', keyEvent({ key: 'i', code: 'KeyI' }));
+    expect(handler).not.toHaveBeenCalled();
+
+    // A clean g then i outside the field still works.
+    emit('keydown', keyEvent({ key: 'g', code: 'KeyG' }));
+    emit('keydown', keyEvent({ key: 'i', code: 'KeyI' }));
+    expect(handler).toHaveBeenCalledOnce();
   });
 });
 

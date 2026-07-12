@@ -19,7 +19,7 @@ scopes, and has seen little maintenance in years.
 | Scopes / context | none (`mousetrap-global-bind` plugin for inputs) | [`when` expressions](/concepts/when-expressions/) |
 | Conflicts | silent | [detected + priority](/concepts/collisions/) |
 | Sequences | ✅ `'g i'` | ✅ `'g i'` |
-| Inputs/textarea | skipped, plugin to override | skipped, [per-engine `ignore`](/core/engine-options/#ignore-event-keyevent--boolean) |
+| Inputs/textarea | skipped, plugin to override | skipped, per-rule [`enableInFormFields`](/core/engine-options/#allow-one-shortcut-in-inputs-per-rule) |
 | Size | ~2.2 kB | ~5.5 kB |
 
 ## Where Mousetrap still wins
@@ -51,8 +51,8 @@ off(); // unbind
 Differences to watch:
 
 - Tactile rules need a stable `id` (it powers collisions, introspection, and help dialogs).
-- `Mousetrap.bindGlobal` (the plugin for shortcuts inside inputs) becomes a custom
-  [`ignore` predicate](/core/engine-options/#ignore-event-keyevent--boolean) — no plugin.
+- `Mousetrap.bindGlobal` (the plugin for shortcuts inside inputs) becomes
+  `enableInFormFields: true` on the rule — no plugin, and sequences stay safely off while typing.
 - Letters match the **physical keycap** by default (what `keyCode` users expect on US layouts, but
   correct everywhere else too).
 

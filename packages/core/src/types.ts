@@ -56,6 +56,15 @@ export interface KeybindingRule {
   description?: string;
   /** Per-rule override of the engine's default match mode. */
   match?: MatchMode;
+  /**
+   * Let this rule fire even while the user is typing in an input, textarea,
+   * select, or contenteditable (i.e. wherever the engine's `ignore` predicate
+   * would normally skip the event). Defaults to `false`.
+   *
+   * Meant for modifier chords like a command palette's `mod+k` — plain keys
+   * would collide with typing, and sequences never fire inside form fields.
+   */
+  enableInFormFields?: boolean;
   /** Whether to call `preventDefault` on a match. Defaults to `true`. */
   preventDefault?: boolean | ((event: KeyEvent) => boolean);
   /** Which event to bind on. Defaults to `'keydown'`. */

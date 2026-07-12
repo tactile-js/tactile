@@ -1,186 +1,472 @@
 ---
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
 import Playground from '../components/playground/Playground.tsx';
 
 const title = 'Playground — Tactile keyboard shortcuts';
 const description =
-  'Try Tactile live in your browser: press shortcuts, inspect KeyboardEvents, toggle scopes, record bindings, and watch collision detection — all running the real @tactile-js engine.';
+  'Operate a mini app entirely with keyboard shortcuts, live in your browser: command palette, sequences, scoped bindings, collision resolution — all running the real @tactile-js engine.';
 ---
 
 <Base title={title} description={description}>
-  <Nav />
-  <main class="wrap">
-    <p class="eyebrow">// playground</p>
-    <h1 class="title">Try it live.</h1>
-    <p class="lede">
-      Everything below runs the real <code>@tactile-js/core</code> engine in your browser — the same
-      code you'd ship. Press keys and watch it resolve.
-    </p>
+  <div class="pgpage">
+    <Nav />
+    <header class="pghead">
+      <h1>Playground</h1>
+      <p>
+        A mini notes app running the real <code>@tactile-js/core</code> engine — press shortcuts in
+        the app, watch the inspector on the right.
+      </p>
+    </header>
     <Playground client:only="react">
-      <p slot="fallback" class="pg__muted">Loading playground…</p>
+      <p slot="fallback" class="pgx-muted" style="padding: 0 1.5rem;">Loading playground…</p>
     </Playground>
-  </main>
-  <Footer />
+  </div>
 </Base>
 
 <style>
-  .wrap {
+  .pgpage {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .pghead {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
     max-width: var(--maxw);
+    width: 100%;
     margin: 0 auto;
-    padding: 2rem 1.5rem 0;
+    padding: 0 1.5rem 0.75rem;
   }
-  .eyebrow {
+  .pghead h1 {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--green-dim);
-    margin: 0 0 1rem;
-  }
-  .title {
-    font-family: var(--font-mono);
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: 1.1rem;
     font-weight: 500;
-    letter-spacing: -0.03em;
-    margin: 0 0 1rem;
+    letter-spacing: -0.02em;
+    margin: 0;
   }
-  .lede {
-    max-width: 42rem;
-    color: var(--text-dim);
-    margin: 0 0 2.5rem;
+  .pghead p {
+    font-size: 0.85rem;
+    color: var(--text-mute);
+    margin: 0;
   }
-  .lede code {
+  .pghead code {
     font-family: var(--font-mono);
     color: var(--green);
     font-size: 0.95em;
   }
+  @media (max-width: 900px) {
+    .pgpage {
+      height: auto;
+      overflow: visible;
+    }
+    .pghead {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
 </style>
 
 <style is:global>
-  .pg__hint {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--text-mute);
-    margin-bottom: 1.5rem;
+  /* ── Playground root: app + inspector rail, fixed to viewport ───── */
+  .pgx {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr min(360px, 35%);
+    gap: 1rem;
+    max-width: var(--maxw);
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1.5rem 1.25rem;
   }
-  .pg__hint kbd,
-  .pg code kbd {
+  .pgx kbd {
     font-family: var(--font-mono);
-    font-size: 0.8em;
+    font-size: 0.72rem;
     padding: 0.1em 0.45em;
     background: var(--surface-2);
     border: 1px solid var(--border-strong);
     border-bottom-width: 3px;
     border-radius: 5px;
     color: var(--text);
+    white-space: nowrap;
   }
-  .pg__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
-  }
-  .pg__card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.1rem 1.25rem;
-  }
-  .pg__card h3 {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--text-mute);
-    font-weight: 500;
-    margin: 0 0 0.9rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .pg__kv {
-    margin: 0;
-    display: grid;
-    gap: 0.5rem;
-  }
-  .pg__kv div {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .pg__kv dt {
-    color: var(--text-mute);
-    font-size: 0.85rem;
-  }
-  .pg__kv dd {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-  }
-  .pg__accent {
-    color: var(--green);
-  }
-  .pg__muted {
-    color: var(--text-mute);
-    font-size: 0.9rem;
-  }
-  .pg__pill {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    padding: 0.1rem 0.5rem;
-    border-radius: 999px;
-    background: var(--green-tint);
-    color: var(--green-bright);
-    border: 1px solid var(--green-dim);
-    text-transform: none;
-    letter-spacing: 0;
-  }
-  .pg__editor {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.85rem;
-    font-size: 0.9rem;
-    color: var(--text-dim);
-    min-height: 90px;
-    cursor: text;
-  }
-  .pg__editor:focus {
-    outline: 2px solid var(--green);
-    outline-offset: 0;
-    color: var(--text);
-  }
-  .pg__editor code,
-  .pg__card code {
+  .pgx code {
     font-family: var(--font-mono);
     color: var(--green);
     font-size: 0.9em;
   }
-  .pg__btn {
-    font-family: var(--font-mono);
+  .pgx-accent {
+    color: var(--green);
+  }
+  .pgx-muted {
+    color: var(--text-mute);
     font-size: 0.85rem;
-    padding: 0.5rem 0.9rem;
+    margin: 0;
+  }
+
+  /* ── Mini app ───────────────────────────────────────────────────── */
+  .pgx-app {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    min-height: 0;
+  }
+  .pgx-side {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.75rem 0.5rem;
+    border-right: 1px solid var(--border);
+    background: var(--bg-deep);
+    min-height: 0;
+  }
+  .pgx-side__head {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-mute);
+    margin: 0 0 0.5rem;
+    padding: 0 0.5rem;
+  }
+  .pgx-side__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    text-align: left;
+    cursor: pointer;
+  }
+  .pgx-side__item:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .pgx-side__item.is-active {
+    background: var(--green-tint);
+    color: var(--green-bright);
+  }
+  .pgx-side__item.is-active kbd {
+    border-color: var(--green-dim);
+    color: var(--green-bright);
+  }
+  .pgx-side__foot {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-top: 1px solid var(--border);
+    padding-top: 0.5rem;
+  }
+  .pgx-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .pgx-title {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 1.1rem;
+  }
+  .pgx-title:focus {
+    outline: none;
+    border-bottom-color: var(--amber);
+  }
+  .pgx-editor {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 1rem 1.1rem;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    cursor: text;
+  }
+  .pgx-editor:focus {
+    outline: none;
+    color: var(--text);
+    box-shadow: inset 2px 0 0 var(--green);
+  }
+  .pgx-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1.1rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-mute);
+  }
+  .pgx-status b {
+    font-weight: 500;
+    color: var(--text-dim);
+  }
+  .pgx-status__typing {
+    color: var(--amber);
+  }
+  .pgx-status__save {
+    margin-left: auto;
+  }
+
+  /* ── Inspector rail ─────────────────────────────────────────────── */
+  .pgx-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 0;
+    overflow: auto;
+  }
+  .pgx-rail section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0.8rem 1rem;
+  }
+  .pgx-rail h3 {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin: 0 0 0.6rem;
+  }
+  .pgx-kv {
+    margin: 0;
+    display: grid;
+    gap: 0.35rem;
+  }
+  .pgx-kv div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .pgx-kv dt {
+    color: var(--text-mute);
+    font-size: 0.78rem;
+  }
+  .pgx-kv dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .pgx-rail__activity ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  .pgx-adv {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .pgx-adv summary {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-mute);
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .pgx-adv section {
+    border: none;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+  }
+  .pgx-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    margin-bottom: 0.6rem;
+  }
+  .pgx-adv__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    display: grid;
+    gap: 0.3rem;
+  }
+  .pgx-btn {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 0.45rem 0.8rem;
     background: var(--surface-2);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius);
     color: var(--text);
     cursor: pointer;
   }
-  .pg__btn--rec {
-    border-color: var(--green);
-    color: var(--green);
+  .pgx-btn:hover {
+    border-color: var(--green-dim);
   }
-  .pg__rec {
-    margin: 0.9rem 0 0;
+  .pgx-adv__rec {
+    margin: 0.6rem 0 0;
+    font-size: 0.85rem;
   }
-  .pg__list {
+
+  /* ── Overlays (palette + help) ──────────────────────────────────── */
+  .pgx-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 4, 9, 0.75);
+    display: grid;
+    place-items: start center;
+    padding-top: 12vh;
+    z-index: 50;
+    backdrop-filter: blur(2px);
+  }
+  .pgx-palette,
+  .pgx-help {
+    width: min(540px, 92vw);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+  }
+  .pgx-palette input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+  }
+  .pgx-palette input:focus {
+    outline: none;
+  }
+  .pgx-palette ul {
     list-style: none;
     margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 0.45rem;
+    padding: 0.3rem 0;
+    max-height: 300px;
+    overflow: auto;
+  }
+  .pgx-palette li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .pgx-palette li.is-active {
+    background: var(--green-tint);
+    color: var(--text);
+  }
+  .pgx-help header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .pgx-help header .pgx-toggle {
+    margin: 0;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+  }
+  .pgx-help__body {
+    padding: 0.75rem 1rem 1rem;
+    max-height: 60vh;
+    overflow: auto;
+  }
+  .pgx-help__body h4 {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-mute);
+    margin: 0.75rem 0 0.4rem;
+    font-weight: 500;
+  }
+  .pgx-help__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.3rem 0;
     font-size: 0.88rem;
     color: var(--text-dim);
   }
-  .pg__list code {
-    font-family: var(--font-mono);
-    color: var(--text);
+  .pgx-help__row kbd {
+    margin-left: 6px;
+  }
+  .pgx-when {
+    font-size: 0.72rem;
+    color: var(--text-mute);
+    background: var(--surface-2);
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+  }
+  .pgx-help__note {
+    margin-top: 1rem;
+    font-size: 0.78rem;
+  }
+
+  /* ── Responsive: stack below 900px, allow scroll ────────────────── */
+  @media (max-width: 900px) {
+    .pgx {
+      grid-template-columns: 1fr;
+      overflow: visible;
+    }
+    .pgx-app {
+      grid-template-columns: 1fr;
+      min-height: 60vh;
+    }
+    .pgx-side {
+      flex-direction: row;
+      flex-wrap: wrap;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .pgx-side__head {
+      display: none;
+    }
+    .pgx-side__foot {
+      margin-top: 0;
+      border-top: none;
+      padding-top: 0;
+      flex-direction: row;
+    }
+    .pgx-rail {
+      overflow: visible;
+    }
   }
 </style>

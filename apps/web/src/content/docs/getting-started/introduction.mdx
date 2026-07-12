@@ -9,16 +9,12 @@ Tactile is a keyboard-shortcut engine that takes **context** and **keyboard layo
 
 Most shortcut libraries are built on the deprecated `KeyboardEvent.keyCode`, treat scopes as an
 afterthought, and leave you to discover binding conflicts at runtime. Tactile starts from a different
-place: a small framework-agnostic core modeled on VS Code's keybinding system — structured rules, a
-`when`-expression context system, and explicit collision resolution — with thin adapters on top.
-
-:::caution[Early status]
-The API is settling but not yet 1.0. Pin versions in production and watch the [changelog](https://github.com/tactile-js/tactile/blob/main/packages/core/CHANGELOG.md).
-:::
+place: a small framework-agnostic core modeled on VS Code's keybinding system structured rules, a
+`when`-expression context system, and explicit collision resolution with thin adapters on top.
 
 ## What makes it different
 
-- **Layout-aware matching.** Bindings match against `event.key` *and* `event.code` depending on what
+- **Layout-aware matching.** Bindings match against `event.key` _and_ `event.code` depending on what
   the key is — never the deprecated `keyCode`. `⌘Z` lands on the physical Z key across layouts; `?`
   matches the character you'd expect. See [Match modes](/concepts/matching/) and
   [International keyboards](/concepts/international-keyboards/).
@@ -34,21 +30,21 @@ The API is settling but not yet 1.0. Pin versions in production and watch the [c
 
 ## Packages
 
-| Package | What it is |
-| --- | --- |
-| `@tactile-js/core` | The framework-agnostic engine. [API reference](/core/api-reference/). |
-| `@tactile-js/react` | React hooks — [overview](/react/overview/). |
+| Package             | What it is                                                            |
+| ------------------- | --------------------------------------------------------------------- |
+| `@tactile-js/core`  | The framework-agnostic engine. [API reference](/core/api-reference/). |
+| `@tactile-js/react` | React hooks — [overview](/react/overview/).                           |
 
 ## Documentation map
 
-| I want to… | Start here |
-| --- | --- |
-| Install and write my first shortcut | [Installation](/getting-started/installation/) → [Quick start](/getting-started/quick-start/) |
-| Understand `code` vs `key` / Dvorak | [Match modes](/concepts/matching/) → [International keyboards](/concepts/international-keyboards/) |
-| Gate shortcuts by UI state | [When expressions](/concepts/when-expressions/) |
-| Build a command palette or help dialog | [Recipes](/guides/recipes/) |
-| See every API option | [Core API](/core/api-reference/) → [Engine options](/core/engine-options/) |
-| Try it in the browser | [Playground](/playground/) |
+| I want to…                             | Start here                                                                                         |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Install and write my first shortcut    | [Installation](/getting-started/installation/) → [Quick start](/getting-started/quick-start/)      |
+| Understand `code` vs `key` / Dvorak    | [Match modes](/concepts/matching/) → [International keyboards](/concepts/international-keyboards/) |
+| Gate shortcuts by UI state             | [When expressions](/concepts/when-expressions/)                                                    |
+| Build a command palette or help dialog | [Recipes](/guides/recipes/)                                                                        |
+| See every API option                   | [Core API](/core/api-reference/) → [Engine options](/core/engine-options/)                         |
+| Try it in the browser                  | [Playground](/playground/)                                                                         |
 
 ## FAQ
 
@@ -66,7 +62,7 @@ binding string for every platform. See [Key syntax](/concepts/key-syntax/).
 ### Why do keyboard shortcuts break on international keyboard layouts?
 
 Most libraries rely on the deprecated `keyCode`, which maps inconsistently across layouts like
-QWERTZ, AZERTY, and Dvorak. Tactile matches on `event.key` *and* `event.code` with a hybrid
+QWERTZ, AZERTY, and Dvorak. Tactile matches on `event.key` _and_ `event.code` with a hybrid
 strategy — ⌘Z stays on the physical Z key while symbols like `?` match the character. See
 [Match modes](/concepts/matching/).
 

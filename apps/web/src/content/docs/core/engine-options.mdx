@@ -1,0 +1,149 @@
+---
+title: Engine options
+description: Configure @tactile-js/core — match mode, sequence timeout, input ignore, custom event sources, platform override, and debug logging.
+---
+
+Pass options to `createKeybindingEngine()` or `<KeybindProvider options={…}>`.
+
+```ts
+import { createKeybindingEngine, defaultIgnore } from '@tactile-js/core';
+
+const kb = createKeybindingEngine({
+  source: undefined,
+  defaultMatch: 'hybrid',
+  sequenceTimeout: 1000,
+  ignore: defaultIgnore,
+  platform: undefined,
+  debug: false,
+});
+```
+
+## `source?: KeyEventSource`
+
+Where key events come from. Defaults to a DOM source on `document`.
+
+Override for tests, Electron, or embedded editors:
+
+```ts
+const kb = createKeybindingEngine({
+  source: {
+    on(type, listener) {
+      const h = (e: KeyboardEvent) => listener(e);
+      document.addEventListener(type, h);
+      return () => document.removeEventListener(type, h);
+    },
+  },
+});
+```
+
+The engine calls `source.on('keydown', …)` and `source.on('keyup', …)` once at creation. Rules are added/removed from the registry — listeners are not re-bound per rule.
+
+## `defaultMatch?: MatchMode`
+
+Default match strategy for rules that don't set their own `match`. Defaults to `'hybrid'`.
+
+| Mode | Behavior |
+| --- | --- |
+| `'hybrid'` | Letters/digits → `event.code`; symbols/named keys → `event.key` |
+| `'physical'` | Always `event.code` (symbols fall back to `event.key`) |
+| `'logical'` | Always `event.key` |
+
+See [Match modes](/concepts/matching/) and [International keyboards](/concepts/international-keyboards/).
+
+```ts
+// Character-based matching for every rule
+const kb = createKeybindingEngine({ defaultMatch: 'logical' });
+```
+
+Per-rule override:
+
+```ts
+kb.add({ id: 'vim.j', keys: 'j', match: 'physical', handler: down });
+```
+
+## `sequenceTimeout?: number`
+
+Maximum gap in milliseconds between strokes of a multi-key sequence. Defaults to `1000`.
+
+```ts
+kb.add({ id: 'inbox', keys: 'g i', handler: goToInbox });
+// 'g' then 'i' within 1000ms
+```
+
+Increase for slower users or accessibility:
+
+```ts
+createKeybindingEngine({ sequenceTimeout: 3000 });
+```
+
+## `ignore?: (event: KeyEvent) => boolean`
+
+Predicate returning `true` when the event should be **skipped**. Defaults to `defaultIgnore`, which returns `true` for:
+
+- `<input>`
+- `<textarea>`
+- `<select>`
+- `contenteditable` elements
+
+```ts
+import { createKeybindingEngine, defaultIgnore } from '@tactile-js/core';
+
+// Never ignore — shortcuts fire everywhere (like VS Code's window listener)
+const kb = createKeybindingEngine({ ignore: () => false });
+```
+
+### Allow specific shortcuts in inputs
+
+```ts
+createKeybindingEngine({
+  ignore: (event) => {
+    if (!defaultIgnore(event)) return false;
+    // Let mod+s through even in inputs
+    if (event.metaKey && event.code === 'KeyS') return false;
+    return true;
+  },
+});
+```
+
+### Monaco / CodeMirror pattern
+
+Gate shortcuts with `when` instead of a global ignore:
+
+```ts
+kb.add({
+  id: 'editor.save',
+  keys: 'mod+s',
+  when: 'editorFocus',
+  handler: save,
+});
+
+// In your editor component on focus/blur:
+kb.context.set('editorFocus', true);
+```
+
+## `platform?: Platform`
+
+Override platform detection (`'mac'` | `'other'`). Auto-detected from `navigator` when omitted.
+
+Affects:
+
+- `mod` resolution (`meta` vs `ctrl`)
+- `format()` label output (`⌘K` vs `Ctrl+K`)
+
+```ts
+// Force Windows-style labels on any OS (e.g. for screenshots)
+kb.format('mod+k', 'other'); // 'Ctrl+K'
+```
+
+## `debug?: boolean`
+
+Log registrations, collisions, and dispatches to the console. Defaults to `false`.
+
+```ts
+const kb = createKeybindingEngine({ debug: true });
+// [keybind] registered palette.open (mod+k)
+// [keybind] collision on "mod+k": a vs b
+// [keybind] mod+k -> palette.open (won over 1)
+```
+
+Useful during development. Disable in production.

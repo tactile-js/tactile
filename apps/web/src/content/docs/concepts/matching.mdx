@@ -25,15 +25,77 @@ chosen by the match mode.
   character is the only thing that behaves internationally.
 - **Named keys → logical.** `Enter`, `ArrowUp`, `F5` have stable, layout-independent `key` values.
 
-Override per binding with `match`, or globally with `defaultMatch`:
+Read [International keyboards](/concepts/international-keyboards/) for the Dvorak/keycap convention and help UI implications.
+
+## Configure match mode
+
+Globally:
 
 ```ts
 const kb = createKeybindingEngine({ defaultMatch: 'hybrid' });
-
-kb.add({ id: 'vim.down', keys: 'j', match: 'physical', handler: down });
 ```
 
+Per rule:
+
+```ts
+kb.add({ id: 'vim.down', keys: 'j', match: 'physical', handler: down });
+kb.add({ id: 'search', keys: 'mod+k', match: 'logical', handler: search });
+```
+
+## Modifier matching
+
+Ctrl, Alt, Meta are matched **exactly**. Shift is matched exactly **except** for symbol main keys:
+producing `?` already requires Shift on many layouts, so enforcing Shift in the binding would make
+`'?'` impossible to register.
+
+```ts
+// These are equivalent on US QWERTY for the ? key:
+kb.add({ id: 'help', keys: '?', handler: help });
+// User presses Shift+/ → event.key is '?', matches
+```
+
+## How matching works at runtime
+
+For each `keydown` (or `keyup` if `eventType: 'keyup'`):
+
+1. **Ignore check** — skip if focused in an input (configurable).
+2. **Context check** — evaluate each rule's `when` against `engine.context`.
+3. **Chord match** — compare modifiers + main key using the rule's match mode.
+4. **Sequence check** — for `g i`, match the last N keystrokes within `sequenceTimeout`.
+5. **Collision resolve** — highest `priority`, then last registered wins.
+6. **Handler** — call with `(event, { id, keys, sequence })`.
+
+## Test cases (what we verify)
+
+```ts
+// German QWERTZ: physical Z produces 'y'
+event = { key: 'y', code: 'KeyZ', ctrlKey: true }
+match('ctrl+z', event, 'hybrid')  // ✅ true  — Z keycap
+match('ctrl+y', event, 'hybrid')  // ❌ false — not the Y keycap
+
+// Dvorak: physical K produces 't'
+event = { key: 't', code: 'KeyK', metaKey: true }
+match('mod+k', event, 'hybrid')   // ✅ true  — K keycap
+
+// Symbol: character matters
+event = { key: '?', code: 'Slash', shiftKey: true }
+match('?', event, 'hybrid')       // ✅ true
+```
+
+## Inspect your hardware
+
 :::tip
-Not sure what your hardware reports for a given key? Open the [playground](/playground/) — it has a
-live KeyboardEvent inspector showing `key`, `code`, and which one hybrid mode would use.
+Open the [playground](/playground/) — the KeyboardEvent inspector shows `key`, `code`, modifiers, and
+which signal hybrid mode would use for each keypress.
 :::
+
+## Lower-level API
+
+For custom tooling, use `matchChord` directly:
+
+```ts
+import { parseBinding, matchChord } from '@tactile-js/core';
+
+const chord = parseBinding('mod+z', 'other')[0];
+matchChord(chord, keyboardEvent, 'hybrid');
+```

@@ -1,62 +1,90 @@
 ---
-title: React hooks
-description: Tactile's React adapter — KeybindProvider, useShortcut, useScope, useShortcutRecorder, and useKeymap for building keyboard shortcuts and command palettes in React.
+title: React overview
+description: '@tactile-js/react — KeybindProvider and hooks for keyboard shortcuts in React. Thin adapter over the core engine with no matching logic of its own.'
 ---
 
-`@tactile-js/react` is a thin layer over the core — it manages engine lifecycle and binding
-registration around the component lifecycle, and re-exports the core so you can import from one place.
+`@tactile-js/react` manages engine lifecycle and binding registration around the React component tree. It contains **no key-matching logic** — that's all in `@tactile-js/core`.
 
-## Setup
+```bash
+npm install @tactile-js/react
+```
+
+Requires `react >= 17` as a peer dependency. Re-exports the entire core surface for one-import ergonomics.
+
+## Quick setup
 
 ```tsx
-import { KeybindProvider } from '@tactile-js/react';
+import { KeybindProvider, useShortcut } from '@tactile-js/react';
 
-<KeybindProvider options={{ defaultMatch: 'hybrid' }}>
+export function App() {
+  return (
+    <KeybindProvider options={{ defaultMatch: 'hybrid' }}>
+      <Editor />
+    </KeybindProvider>
+  );
+}
+
+function Editor() {
+  useShortcut({
+    id: 'save',
+    keys: 'mod+s',
+    handler: () => save(),
+  });
+  return <main />;
+}
+```
+
+## API surface
+
+| Export | Description |
+| --- | --- |
+| [`KeybindProvider`](/react/keybind-provider/) | Creates or adopts an engine; shares it via context. |
+| [`useEngine`](/react/keybind-provider/#useengine) | Access the engine from any descendant. |
+| [`useShortcut`](/react/use-shortcut/) | Register a shortcut for the component's lifetime. |
+| [`useScope`](/react/use-scope/) | Control context keys and scopes. |
+| [`useKeymap`](/react/use-keymap/) | Live keymap for help dialogs. |
+| [`useShortcutRecorder`](/react/use-shortcut-recorder/) | "Press a key to rebind" primitive. |
+| `*` from `@tactile-js/core` | Full core API re-exported. |
+
+## Architecture
+
+```
+<KeybindProvider>          ← one engine per provider
+  ├─ useShortcut()         ← registers on mount, unregisters on unmount
+  ├─ useScope()            ← mutates engine.context
+  ├─ useKeymap()           ← subscribes to registry + context changes
+  └─ useShortcutRecorder() ← wraps engine.recordShortcut()
+```
+
+### Multiple providers
+
+Nest providers only if you need **isolated** shortcut systems (e.g. a sandboxed iframe UI). Most apps need one provider at the root.
+
+### Injecting a custom engine
+
+```tsx
+const kb = createKeybindingEngine({ debug: true });
+
+<KeybindProvider engine={kb}>
   <App />
-</KeybindProvider>;
+</KeybindProvider>
 ```
 
-## `useShortcut`
+The provider will **not** call `dispose()` on an injected engine — lifecycle is yours.
 
-Registers a shortcut for the component's lifetime (auto add/remove). The handler is read through a
-ref, so it always sees current state without re-registering.
+## When to use core directly
 
-```tsx
-useShortcut({
-  id: 'palette.open',
-  keys: 'mod+k',
-  when: "scope == 'global'",
-  handler: () => setOpen((o) => !o),
-});
-```
+Use `@tactile-js/core` without React when:
 
-## `useScope`
+- Building a Vue/Svelte adapter
+- Running in Electron main process with a custom `KeyEventSource`
+- Unit testing matchers without jsdom
 
-Imperative controls over context keys and scopes.
+Use the React package when you're in React and want lifecycle-safe registration.
 
-```tsx
-const { set, setScope, enableScope, disableScope, toggleScope } = useScope();
+## Next steps
 
-setScope('editor');        // gates: when "scope == 'editor'"
-enableScope('terminal');   // gates: when "scope.terminal"
-```
-
-## `useShortcutRecorder`
-
-The primitive behind a "press a key to rebind" settings field.
-
-```tsx
-const { isRecording, combo, start, stop } = useShortcutRecorder();
-// combo -> { binding: 'ctrl+shift+k', label: '⌃⇧K' }
-```
-
-## `useKeymap`
-
-The live keymap, for building a shortcuts help dialog that can't drift from what's registered.
-
-```tsx
-const keymap = useKeymap();                 // all rules, with formatted labels
-const active = useKeymap({ forContext: true }); // only rules active right now
-```
-
-Try all of these live in the [playground](/playground/).
+- [KeybindProvider](/react/keybind-provider/) — options and engine lifecycle
+- [useShortcut](/react/use-shortcut/) — the workhorse hook
+- [Recipes](/guides/recipes/) — command palette, help dialog, editor scopes
+- [Playground](/playground/) — try everything live

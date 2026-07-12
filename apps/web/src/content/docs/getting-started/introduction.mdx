@@ -10,24 +10,42 @@ afterthought, and leave you to discover binding conflicts at runtime. Tactile st
 place: a small framework-agnostic core modeled on VS Code's keybinding system — structured rules, a
 `when`-expression context system, and explicit collision resolution — with thin adapters on top.
 
+:::caution[Early status]
+The API is settling but not yet 1.0. Pin versions in production and watch the [changelog](https://github.com/tactile-js/tactile/blob/main/packages/core/CHANGELOG.md).
+:::
+
 ## What makes it different
 
 - **Layout-aware matching.** Bindings match against `event.key` *and* `event.code` depending on what
   the key is — never the deprecated `keyCode`. `⌘Z` lands on the physical Z key across layouts; `?`
-  matches the character you'd expect. See [Match modes](/concepts/matching/).
+  matches the character you'd expect. See [Match modes](/concepts/matching/) and
+  [International keyboards](/concepts/international-keyboards/).
 - **`when` expressions, not flags.** Gate any rule with a boolean expression over context keys
   (`scope == 'editor' && !readOnly`). Named scopes are just sugar over context keys — one concept to
   learn, not two.
 - **Collisions are first-class.** `getCollisions()` tells you when two rules fight over the same
   keystroke; at runtime, ties resolve by priority then registration order, the same model VS Code uses.
+- **Introspection built in.** `getKeymap()` returns every binding with platform-formatted labels — help
+  dialogs that can't drift from what's registered.
 - **A real core/adapter split.** The engine talks to a `KeyEventSource` interface, not the DOM
-  directly — so it's fully unit-tested in Node and reusable by any framework adapter.
+  directly — fully unit-tested in Node and reusable by any framework adapter.
 
 ## Packages
 
 | Package | What it is |
 | --- | --- |
-| `@tactile-js/core` | The framework-agnostic engine. |
-| `@tactile-js/react` | React hooks — `useShortcut`, `useScope`, `useShortcutRecorder`, `useKeymap`. |
+| `@tactile-js/core` | The framework-agnostic engine. [API reference](/core/api-reference/). |
+| `@tactile-js/react` | React hooks — [overview](/react/overview/). |
+
+## Documentation map
+
+| I want to… | Start here |
+| --- | --- |
+| Install and write my first shortcut | [Installation](/getting-started/installation/) → [Quick start](/getting-started/quick-start/) |
+| Understand `code` vs `key` / Dvorak | [Match modes](/concepts/matching/) → [International keyboards](/concepts/international-keyboards/) |
+| Gate shortcuts by UI state | [When expressions](/concepts/when-expressions/) |
+| Build a command palette or help dialog | [Recipes](/guides/recipes/) |
+| See every API option | [Core API](/core/api-reference/) → [Engine options](/core/engine-options/) |
+| Try it in the browser | [Playground](/playground/) |
 
 Ready? Head to [Installation](/getting-started/installation/).

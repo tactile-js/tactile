@@ -1,0 +1,102 @@
+---
+title: KeybindProvider
+description: KeybindProvider and useEngine — create, share, and access the Tactile keyboard shortcut engine in React.
+---
+
+## `KeybindProvider`
+
+Creates (or adopts) a single engine and shares it with all descendants.
+
+```tsx
+import { KeybindProvider } from '@tactile-js/react';
+
+<KeybindProvider options={{ defaultMatch: 'hybrid', debug: false }}>
+  <App />
+</KeybindProvider>
+```
+
+### Props
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `options` | `EngineOptions` | Passed to `createKeybindingEngine()` when creating a new engine. Ignored if `engine` is set. |
+| `engine` | `KeybindingEngine` | Supply a pre-built engine. Provider will **not** dispose it on unmount. |
+| `children` | `ReactNode` | App tree. |
+
+### Lifecycle
+
+- Engine is created **once** per provider mount (lazy `useState` initializer).
+- Provider-created engines call `engine.dispose()` on unmount.
+- Injected engines are left alone.
+
+```tsx
+// Testing: share one engine across tests
+const kb = createKeybindingEngine();
+render(
+  <KeybindProvider engine={kb}>
+    <ComponentUnderTest />
+  </KeybindProvider>,
+);
+// kb.dispose() — your responsibility
+```
+
+### Common options
+
+```tsx
+<KeybindProvider
+  options={{
+    defaultMatch: 'hybrid',
+    sequenceTimeout: 2000,
+    debug: import.meta.env.DEV,
+    ignore: defaultIgnore, // or () => false
+  }}
+>
+```
+
+See [Engine options](/core/engine-options/).
+
+---
+
+## `useEngine()`
+
+Access the engine from any descendant of `KeybindProvider`.
+
+```tsx
+import { useEngine } from '@tactile-js/react';
+
+function HelpButton() {
+  const engine = useEngine();
+
+  return (
+    <button onClick={() => console.log(engine.getKeymap())}>
+      Log keymap
+    </button>
+  );
+}
+```
+
+Throws a clear error if used outside a provider.
+
+### Common uses
+
+```tsx
+const engine = useEngine();
+
+// Format labels
+engine.format('mod+k'); // '⌘K' or 'Ctrl+K'
+
+// Imperative context (prefer useScope in components)
+engine.context.set('modalOpen', true);
+
+// Introspection
+engine.getCollisions();
+engine.getKeymap();
+
+// Subscribe outside React
+engine.subscribeKeymap(() => refresh());
+engine.context.subscribe(() => refresh());
+```
+
+### Don't call `dispose()` from hooks
+
+Let the provider manage disposal. If you injected the engine, dispose it when **your** app shuts down.

@@ -44,5 +44,52 @@ kb.context.set('scope', 'editor');       // when: "scope == 'editor'"
 kb.context.set('scope.terminal', true);  // when: "scope.terminal"
 ```
 
-In React, [`useScope`](/react/overview/) gives you `setScope`, `enableScope`, and friends as a thin
+In React, [`useScope`](/react/use-scope/) gives you `setScope`, `enableScope`, and friends as a thin
 convenience over exactly this.
+
+## Examples
+
+### Editor + read-only
+
+```ts
+kb.context.set('scope', 'editor');
+kb.context.set('readOnly', false);
+
+kb.add({ id: 'bold', keys: 'mod+b', when: "scope == 'editor' && !readOnly", handler: bold });
+kb.add({ id: 'save', keys: 'mod+s', when: "scope == 'editor' && !readOnly", handler: save });
+```
+
+### Modal blocks background shortcuts
+
+```ts
+kb.context.set('modalOpen', true);
+
+kb.add({ id: 'palette', keys: 'mod+k', when: '!modalOpen', handler: palette });
+kb.add({ id: 'modal.close', keys: 'escape', when: 'modalOpen', handler: closeModal });
+```
+
+### Language-specific binding
+
+```ts
+kb.context.set('editor.langId', 'typescript');
+
+kb.add({
+  id: 'rename',
+  keys: 'f2',
+  when: "editor.langId == 'typescript'",
+  handler: rename,
+});
+```
+
+### Membership test
+
+```ts
+kb.context.set('mode', 'insert');
+
+kb.add({
+  id: 'normal-mode',
+  keys: 'escape',
+  when: "mode in 'insert replace'",
+  handler: () => kb.context.set('mode', 'normal'),
+});
+```

@@ -1,0 +1,107 @@
+---
+title: useKeymap
+description: Build shortcuts help dialogs with useKeymap — live keymap from the registry with formatted labels, filtered by active context.
+---
+
+Returns the live keymap for building help dialogs and shortcut listings. Re-renders when rules are added/removed **or** context keys change.
+
+```tsx
+import { useKeymap } from '@tactile-js/react';
+
+const keymap = useKeymap();
+const active = useKeymap({ forContext: true });
+```
+
+## Signature
+
+```ts
+function useKeymap(options?: { forContext?: boolean }): ResolvedBinding[]
+```
+
+## `ResolvedBinding` shape
+
+```ts
+{
+  id: string;
+  keys: string[];      // ['mod+k']
+  labels: string[];    // ['⌘K'] — platform-formatted
+  when?: string;
+  group?: string;
+  description?: string;
+  priority: number;
+}
+```
+
+## All bindings
+
+```tsx
+function ShortcutsDialog() {
+  const keymap = useKeymap();
+
+  return (
+    <ul>
+      {keymap.map((rule) => (
+        <li key={rule.id}>
+          <kbd>{rule.labels.join(' / ')}</kbd>
+          {rule.description ?? rule.id}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Active bindings only
+
+`forContext: true` filters to rules whose `when` holds in the **current** context:
+
+```tsx
+const active = useKeymap({ forContext: true });
+// Only shortcuts that would fire right now
+```
+
+Updates automatically when you call `setScope()`, `set()`, etc.
+
+## Group by category
+
+```tsx
+const keymap = useKeymap();
+
+const byGroup = keymap.reduce<Record<string, typeof keymap>>((acc, rule) => {
+  const g = rule.group ?? 'Other';
+  (acc[g] ??= []).push(rule);
+  return acc;
+}, {});
+
+return Object.entries(byGroup).map(([group, rules]) => (
+  <section key={group}>
+    <h3>{group}</h3>
+    {rules.map((r) => (
+      <div key={r.id}>
+        <kbd>{r.labels[0]}</kbd> {r.description}
+      </div>
+    ))}
+  </section>
+));
+```
+
+## Show `when` conditions
+
+```tsx
+{rule.when && (
+  <span className="when">when: {rule.when}</span>
+)}
+```
+
+## Labels and international layouts
+
+`labels` come from `format()` — they reflect the **binding string**, not what a keycap types on Dvorak/AZERTY. See [International keyboards](/concepts/international-keyboards/).
+
+## Core equivalent
+
+```ts
+const all = kb.getKeymap();
+const active = kb.getKeymapForContext(kb.context.snapshot());
+```
+
+`useKeymap` subscribes to both registry and context changes so React stays in sync.

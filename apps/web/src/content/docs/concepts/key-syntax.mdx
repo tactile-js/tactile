@@ -1,19 +1,55 @@
 ---
 title: Key syntax & bindings
-description: How to write keyboard shortcut bindings in Tactile — combos, sequences, the mod alias, and named keys.
+description: How to write keyboard shortcut bindings in Tactile — combos, sequences, the mod alias, named keys, symbols, and alternatives.
 ---
 
-A binding is a string. Tactile parses it into one or more chords.
+A binding is a string (or array of strings). Tactile parses it into one or more **chords** — a single keystroke with modifier flags and a main key.
 
-- **Combos** — join keys with `+`: `mod+shift+k`, `ctrl+alt+delete`
-- **Sequences** — separate strokes with spaces: `g i`, `ctrl+k ctrl+s`
-- **`mod`** — resolves to `⌘` on macOS and `Ctrl` everywhere else, so you write one binding for both
-- **Alternatives** — pass an array: `['mod+k', 'ctrl+p']`
+## Combos
+
+Join keys with `+`:
+
+```ts
+'mod+shift+k'
+'ctrl+alt+delete'
+'alt+enter'
+```
+
+## Sequences
+
+Separate strokes with spaces. Each stroke must complete within `sequenceTimeout` (default 1000ms):
+
+```ts
+'g i'              // press g, then i
+'ctrl+k ctrl+s'    // two combos in sequence
+```
+
+## The `mod` alias
+
+Resolves per platform — `meta` (⌘) on macOS, `ctrl` on Windows/Linux:
+
+```ts
+'mod+k'  // ⌘K on Mac, Ctrl+K elsewhere
+```
+
+Write one binding instead of maintaining separate Mac/Windows strings.
+
+## Alternatives
+
+Pass an array — any variant matches:
+
+```ts
+keys: ['mod+k', 'ctrl+p']
+```
+
+## Full examples
 
 ```ts
 kb.add({ id: 'save', keys: 'mod+s', handler: save });
-kb.add({ id: 'inbox', keys: 'g i', handler: goToInbox });      // press g, then i
-kb.add({ id: 'open', keys: ['mod+o', 'mod+p'], handler: open }); // either works
+kb.add({ id: 'inbox', keys: 'g i', handler: goToInbox });
+kb.add({ id: 'open', keys: ['mod+o', 'mod+p'], handler: open });
+kb.add({ id: 'help', keys: '?', handler: help });
+kb.add({ id: 'delete-line', keys: 'ctrl+shift+delete', handler: deleteLine });
 ```
 
 ## Modifier aliases
@@ -28,6 +64,59 @@ kb.add({ id: 'open', keys: ['mod+o', 'mod+p'], handler: open }); // either works
 
 ## Named keys
 
-`enter`, `esc`, `space`, `tab`, `backspace`, `delete`, `up`/`arrowup`, `down`, `left`, `right`,
-`home`, `end`, `pageup`, `pagedown`, `f1`–`f24`, and more. Symbols can be written directly (`?`, `/`,
-`.`) or spelled out (`plus`, `slash`, `comma`).
+| Category | Tokens |
+| --- | --- |
+| Editing | `enter`, `esc`, `space`, `tab`, `backspace`, `delete`, `insert` |
+| Arrows | `up`, `down`, `left`, `right` (aliases: `arrowup`, etc.) |
+| Navigation | `home`, `end`, `pageup`, `pagedown` |
+| Function | `f1` through `f24` |
+| Other | `capslock` |
+
+## Symbols
+
+Type directly or spell out:
+
+| Glyph | Spelled |
+| --- | --- |
+| `?` | — |
+| `/` | `slash` |
+| `+` | `plus` |
+| `-` | `minus` |
+| `.` | `period`, `dot` |
+| `,` | `comma` |
+| `;` | `semicolon` |
+| `'` | `quote` |
+| `` ` `` | `backtick` |
+| `=` | `equal`, `equals` |
+| `~` | `tilde` |
+| `\` | `backslash` |
+
+### The literal `+` key
+
+Use an empty segment: `ctrl++` binds Ctrl + the plus key.
+
+## Parse errors
+
+Invalid bindings throw `KeybindingParseError` at registration time:
+
+```ts
+kb.add({ id: 'bad', keys: 'ctrl+', handler: fn }); // Error: expected a key
+```
+
+## Display labels
+
+```ts
+kb.format('mod+shift+p'); // '⇧⌘P' on macOS, 'Ctrl+Shift+P' elsewhere
+```
+
+Labels come from the binding string, not the current OS keyboard layout. See [International keyboards](/concepts/international-keyboards/).
+
+## Match mode per binding
+
+```ts
+kb.add({ id: 'a', keys: 'mod+z', match: 'hybrid', handler: undo });    // default
+kb.add({ id: 'b', keys: 'mod+z', match: 'logical', handler: undoAlt }); // character
+kb.add({ id: 'c', keys: 'mod+z', match: 'physical', handler: undoPhys }); // keycap
+```
+
+See [Match modes](/concepts/matching/).

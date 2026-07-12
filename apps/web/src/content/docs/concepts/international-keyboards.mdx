@@ -1,0 +1,112 @@
+---
+title: International keyboards
+description: How Tactile handles QWERTZ, AZERTY, Dvorak, and other keyboard layouts — keycap position vs character matching, and what your help UI should show.
+---
+
+This is the most common source of confusion with keyboard shortcuts. Read this before filing a layout bug.
+
+## Two conventions (pick one consciously)
+
+When your UI shows `⌘K`, users can interpret it two ways:
+
+| Convention | `⌘K` means | Dvorak user presses |
+| --- | --- | --- |
+| **Keycap position** (industry default) | The K-labeled key on the keyboard | Physical K key (`KeyK`) — types `t` on Dvorak |
+| **Character** | Whatever key produces `k` | Physical C key (`KeyC`) on US Dvorak |
+
+**Tactile's hybrid default follows keycap position for letters** — the same convention as VS Code, Chrome, Slack, and most desktop apps.
+
+There is no choice that's right for every app. Tactile documents the tradeoff and offers an escape hatch.
+
+## How hybrid mode decides
+
+| Token type | Matches on | Example |
+| --- | --- | --- |
+| Letters (`a`–`z`) | `event.code` (physical) | `mod+z` → `KeyZ` position |
+| Digits (`0`–`9`) | `event.code` (physical) | `mod+2` → `Digit2` position |
+| Symbols (`?`, `/`) | `event.key` (character) | `?` → glyph `?` |
+| Named keys (`enter`, `f5`) | `event.key` (logical) | `enter` → `Enter` |
+
+### German QWERTZ (the classic bug)
+
+On QWERTZ, the physical Z key produces `y`. Old `keyCode`-based libraries break undo:
+
+```ts
+// Physical Z key on German layout:
+// event.key = 'y', event.code = 'KeyZ'
+
+kb.add({ id: 'undo', keys: 'mod+z', handler: undo });
+// ✅ Fires on the Z keycap — correct for "⌘Z undo"
+```
+
+`mod+y` would **not** fire on that key — because you bound the Z *position*, not the character `y`.
+
+### Dvorak
+
+On US Dvorak:
+
+| Key pressed | `code` | `key` | `mod+k` fires? |
+| --- | --- | --- | --- |
+| Physical K keycap | `KeyK` | `t` | **Yes** |
+| Key that types `k` | `KeyC` | `k` | **No** |
+
+Dvorak power users learn that `⌘K` means the K keycap, not the character — same as VS Code.
+
+### Symbols work internationally
+
+`?` matches `event.key === '?'` regardless of which physical key produced it on the current layout. Shift is lenient for symbols (producing `?` often already requires Shift).
+
+## Override: logical mode
+
+If your product means "press the key that types this character":
+
+```ts
+// Per rule
+kb.add({ id: 'search', keys: 'mod+k', match: 'logical', handler: search });
+
+// Globally
+const kb = createKeybindingEngine({ defaultMatch: 'logical' });
+```
+
+**Tradeoff:** `mod+z` undo on QWERTZ would require pressing the key that types `z`, not the Z keycap.
+
+## Help UI labels
+
+`format()` and `getKeymap().labels` reflect the **binding string** (`⌘K`), not the local keycap character on alternate layouts.
+
+VS Code shows both: local label + US standard warning. Tactile does not yet remap labels per layout — document this in your help UI if you have Dvorak/Colemak users.
+
+```ts
+const keymap = kb.getKeymap();
+// labels: ['⌘K'] — always from the binding 'mod+k'
+// On Dvorak, the K keycap types 't', but the label still shows K
+```
+
+:::tip
+Use the [playground](/playground/) KeyboardEvent inspector to see exactly what `key` and `code` your hardware reports.
+:::
+
+## What we don't handle yet
+
+Being honest upfront:
+
+| Gap | Workaround |
+| --- | --- |
+| IME / composition (CJK) | Gate with `when: '!composing'` and set `composing` context during composition |
+| AltGraph (European) | No special mapping — `altKey` is a single boolean |
+| Numpad vs main Enter | Treated as separate codes (`NumpadEnter` vs `Enter`) |
+| Layout-local label formatting | Use `format()` + document the keycap convention |
+
+See [Limitations](/concepts/limitations/) for the full list.
+
+## Recommended messaging
+
+**Say this:**
+
+> Letter shortcuts match keycap position (`event.code`), like VS Code. Symbol shortcuts match the character (`event.key`). Override with `match: 'logical'` if your app needs character-based matching.
+
+**Don't say this:**
+
+> Works correctly on all keyboard layouts.
+
+The web platform has hard edges. Tactile handles the common cases correctly and lets you choose the convention for edge cases.

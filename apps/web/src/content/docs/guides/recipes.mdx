@@ -1,0 +1,308 @@
+---
+title: Recipes & examples
+description: Common patterns with Tactile — command palettes, shortcuts help dialogs, scoped editor bindings, custom event sources, and input-field handling.
+---
+
+Copy-paste starting points for real features.
+
+## Command palette
+
+```tsx
+import { useEffect, useState } from 'react';
+import { KeybindProvider, useShortcut, useEngine } from '@tactile-js/react';
+
+function App() {
+  return (
+    <KeybindProvider>
+      <Palette />
+    </KeybindProvider>
+  );
+}
+
+function Palette() {
+  const engine = useEngine();
+  const [open, setOpen] = useState(false);
+
+  useShortcut({
+    id: 'palette.toggle',
+    keys: 'mod+k',
+    group: 'Navigation',
+    description: 'Toggle command palette',
+    handler: () => setOpen((o) => !o),
+  });
+
+  // Close on Escape
+  useShortcut({
+    id: 'palette.close',
+    keys: 'escape',
+    when: 'paletteOpen',
+    handler: () => setOpen(false),
+  });
+
+  // Sync context for when-gated close shortcut
+  useEffect(() => {
+    if (open) engine.context.set('paletteOpen', true);
+    else engine.context.delete('paletteOpen');
+  }, [open, engine]);
+
+  if (!open) return null;
+
+  return (
+    <dialog open>
+      <input placeholder="Type a command…" autoFocus />
+      {/* filter commands, run on Enter */}
+    </dialog>
+  );
+}
+```
+
+## Shortcuts help dialog
+
+Use `useKeymap` so the dialog can't drift from registered bindings:
+
+```tsx
+import { useKeymap } from '@tactile-js/react';
+
+function ShortcutsHelp({ onClose }: { onClose: () => void }) {
+  const keymap = useKeymap({ forContext: true }); // only active shortcuts
+
+  useShortcut({ id: 'help.close', keys: 'escape', handler: onClose });
+
+  const groups = Map.groupBy(keymap, (r) => r.group ?? 'Other');
+
+  return (
+    <dialog open>
+      <h2>Keyboard shortcuts</h2>
+      {[...groups.entries()].map(([group, rules]) => (
+        <section key={group}>
+          <h3>{group}</h3>
+          <ul>
+            {rules.map((r) => (
+              <li key={r.id}>
+                <kbd>{r.labels.join(' / ')}</kbd>
+                <span>{r.description ?? r.id}</span>
+                {r.when && <code>{r.when}</code>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </dialog>
+  );
+}
+```
+
+Toggle with `?` or `mod+shift+slash`:
+
+```tsx
+useShortcut({
+  id: 'help.toggle',
+  keys: '?',
+  description: 'Show keyboard shortcuts',
+  handler: () => setHelpOpen((o) => !o),
+});
+```
+
+## Scoped editor shortcuts
+
+```tsx
+function Editor() {
+  const { setScope } = useScope();
+  const [bold, setBold] = useState(false);
+
+  useShortcut({
+    id: 'editor.bold',
+    keys: 'mod+b',
+    when: "scope == 'editor'",
+    group: 'Editing',
+    description: 'Toggle bold',
+    handler: () => setBold((b) => !b),
+  });
+
+  return (
+    <div
+      tabIndex={0}
+      contentEditable
+      style={{ fontWeight: bold ? 700 : 400 }}
+      onFocus={() => setScope('editor')}
+      onBlur={() => setScope('global')}
+    />
+  );
+}
+```
+
+### Multiple scope flags
+
+```tsx
+const { enableScope, disableScope } = useScope();
+
+// Gate with: when "scope.terminal"
+enableScope('terminal');
+
+// Or independent context keys:
+const { set } = useScope();
+set('modalOpen', true);
+// when: "!modalOpen"
+```
+
+## Sequences (Gmail-style)
+
+```ts
+kb.add({
+  id: 'go.inbox',
+  keys: 'g i',
+  description: 'Go to inbox',
+  handler: () => router.push('/inbox'),
+});
+
+// Optional: longer timeout for accessibility
+createKeybindingEngine({ sequenceTimeout: 3000 });
+```
+
+Single-letter prefixes (`g` alone) won't fire unless you register them — only complete sequences match.
+
+## Alternative bindings (cross-platform)
+
+```ts
+// mod+k is usually enough — mod resolves per platform
+kb.add({ id: 'palette', keys: 'mod+k', handler: open });
+
+// Explicit alternatives when needed
+kb.add({
+  id: 'palette',
+  keys: ['mod+k', 'ctrl+p'], // either works
+  handler: open,
+});
+```
+
+## User rebinding UI
+
+```tsx
+function RebindField({ onSave }: { onSave: (binding: string) => void }) {
+  const { isRecording, combo, start, stop } = useShortcutRecorder();
+
+  return (
+    <div>
+      <button onClick={isRecording ? stop : start}>
+        {isRecording ? 'Press keys…' : 'Change shortcut'}
+      </button>
+      {combo && (
+        <p>
+          Captured: <kbd>{combo.label}</kbd>
+          <button onClick={() => onSave(combo.binding)}>Save</button>
+        </p>
+      )}
+    </div>
+  );
+}
+```
+
+Check collisions before saving:
+
+```ts
+function wouldCollide(engine: KeybindingEngine, binding: string, id: string) {
+  return engine.getCollisions().some(
+    (c) => c.keys === binding && c.rules.some((r) => r.id !== id),
+  );
+}
+```
+
+## Custom event source (Electron / tests)
+
+```ts
+import { createKeybindingEngine, type KeyEvent } from '@tactile-js/core';
+
+// Node test — no DOM
+const events: Array<{ type: 'keydown'; event: KeyEvent }> = [];
+const listeners = new Map<string, Set<(e: KeyEvent) => void>>();
+
+const kb = createKeybindingEngine({
+  source: {
+    on(type, listener) {
+      const set = listeners.get(type) ?? new Set();
+      set.add(listener);
+      listeners.set(type, set);
+      return () => set.delete(listener);
+    },
+  },
+});
+
+kb.add({ id: 'save', keys: 'mod+s', handler: save });
+
+// Simulate keypress
+function press(e: KeyEvent) {
+  for (const fn of listeners.get('keydown') ?? []) fn(e);
+}
+
+press({ key: 's', code: 'KeyS', metaKey: true, ctrlKey: false, shiftKey: false, altKey: false });
+```
+
+## Input fields: three strategies
+
+### 1. Default ignore (recommended)
+
+Shortcuts don't fire in inputs. No extra work.
+
+### 2. Per-shortcut `when` (VS Code style)
+
+```ts
+createKeybindingEngine({ ignore: () => false });
+
+kb.add({ id: 'bold', keys: 'mod+b', when: 'editorFocus', handler: bold });
+kb.add({ id: 'palette', keys: 'mod+k', when: '!textInputFocus', handler: palette });
+```
+
+### 3. Selective passthrough
+
+```ts
+createKeybindingEngine({
+  ignore: (event) => {
+    if (event.metaKey && event.code === 'KeyS') return false; // save everywhere
+    return defaultIgnore(event);
+  },
+});
+```
+
+## Handler: skip preventDefault
+
+```ts
+kb.add({
+  id: 'log.key',
+  keys: 'mod+shift+l',
+  handler: (event, info) => {
+    console.log(info.id, info.keys);
+    return false; // let the browser handle it too
+  },
+});
+```
+
+## Dynamic priority override
+
+```ts
+// Default binding
+kb.add({ id: 'palette.default', keys: 'mod+k', handler: defaultPalette });
+
+// Extension overrides with higher priority
+kb.add({
+  id: 'palette.extension',
+  keys: 'mod+k',
+  priority: 10,
+  handler: extensionPalette,
+});
+```
+
+## Vanilla JS (no React)
+
+```ts
+import { createKeybindingEngine } from '@tactile-js/core';
+
+const kb = createKeybindingEngine();
+
+kb.add({ id: 'save', keys: 'mod+s', handler: () => save() });
+
+document.getElementById('editor')?.addEventListener('focus', () => {
+  kb.context.set('scope', 'editor');
+});
+```
+
+See the [React hooks](/react/overview/) for the component lifecycle equivalent.

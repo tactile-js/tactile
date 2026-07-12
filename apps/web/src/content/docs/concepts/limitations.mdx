@@ -1,0 +1,91 @@
+---
+title: Limitations
+description: Known limitations of keyboard shortcuts on the web and in Tactile — OS-reserved keys, IME, layout labels, and browser constraints.
+---
+
+Keyboard handling on the web has hard edges. Tactile is honest about them so you don't waste time on unfixable bugs.
+
+## OS and browser-reserved shortcuts
+
+These are intercepted **before your page sees them**. No library can reliably override them:
+
+| Platform | Examples |
+| --- | --- |
+| macOS | `Cmd+W` (close tab), `Cmd+Q` (quit), `Cmd+T` (new tab), `Cmd+Tab` |
+| Windows/Linux | `Alt+F4`, `Ctrl+W`, browser chrome shortcuts |
+| All | `F11` (fullscreen), `F5` (refresh) in many browsers |
+
+**Don't bind these.** Pick alternatives (`mod+shift+p` for palette, etc.).
+
+## Physical vs logical — no universal default
+
+On Dvorak, AZERTY, or QWERTZ layouts, "the Z key" and "the letter Z" diverge. Hybrid mode picks keycap position for letters — the industry convention — but some users expect character matching.
+
+- Default: keycap position for letters
+- Override: `match: 'logical'` per rule or `defaultMatch: 'logical'` globally
+
+See [International keyboards](/concepts/international-keyboards/).
+
+## Help labels vs layout
+
+`format()` and `getKeymap().labels` show labels derived from the **binding string** (`⌘K` for `mod+k`). They do not automatically show what a keycap types on Dvorak or AZERTY.
+
+VS Code solves this with layout-aware labels + warnings. Tactile keeps labels simpler — note the convention in your help UI if needed.
+
+## Symbols in `physical` mode
+
+Most punctuation has a layout-dependent `code`. In `physical` mode, symbol tokens fall back to character matching. This is documented behavior, not a bug.
+
+## Form fields
+
+By default, shortcuts don't fire while typing in `input`, `textarea`, `select`, or `contenteditable`. Override with `EngineOptions.ignore`.
+
+If you disable the ignore predicate, you must gate shortcuts with `when` expressions (e.g. `!textInputFocus`) — the VS Code approach.
+
+## IME / composition (CJK input)
+
+Tactile does not automatically suppress shortcuts during IME composition. VS Code sets an `isComposing` context key; you can do the same:
+
+```ts
+element.addEventListener('compositionstart', () => {
+  kb.context.set('composing', true);
+});
+element.addEventListener('compositionend', () => {
+  kb.context.delete('composing');
+});
+
+kb.add({
+  id: 'palette',
+  keys: 'mod+k',
+  when: '!composing',
+  handler: openPalette,
+});
+```
+
+## Key repeat
+
+Held keys emit repeated `keydown` events (`event.repeat === true`). Tactile ignores repeats for **sequence buffering** but single-chord handlers can still fire on repeat. Debounce in your handler if needed:
+
+```ts
+handler: (event) => {
+  if (event.repeat) return;
+  togglePalette();
+},
+```
+
+## AltGraph and numpad
+
+- **AltGraph** is not distinguished from Alt — `altKey` is one boolean.
+- **Numpad Enter** (`NumpadEnter`) and main **Enter** (`Enter`) are separate `code` values. The `enter` token matches `event.key === 'Enter'` (logical), which typically covers both — but physical-only matching would treat them differently.
+
+## Single-modifier chords
+
+VS Code supports `shift shift` (double-tap Shift) via `keyup` timing. Tactile supports `keyup` bindings via `eventType: 'keyup'` but does not implement double-tap modifier detection.
+
+## iframes and shadow DOM
+
+The default listener is on `document`. Events from focused iframes may not reach your page's listener depending on origin. Shadow DOM events retarget — `event.target` may not be the inner element.
+
+## Early status
+
+Tactile is pre-1.0. The API is settling. Pin versions in production and watch the changelog.

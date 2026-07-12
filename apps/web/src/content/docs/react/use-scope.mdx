@@ -1,0 +1,141 @@
+---
+title: useScope
+description: Control Tactile context keys and scopes in React — setScope, enableScope, and imperative context for when expressions.
+---
+
+Imperative controls over the engine's context keys. Scopes are **not** a separate concept — they're just context keys that `when` expressions read.
+
+```tsx
+import { useScope } from '@tactile-js/react';
+
+const { set, remove, setScope, enableScope, disableScope, toggleScope } = useScope();
+```
+
+## API
+
+| Method | Effect | Gates rules with |
+| --- | --- | --- |
+| `set(key, value)` | Set any context key | `key`, `key == value` |
+| `remove(key)` | Delete a context key | key becomes undefined/falsy |
+| `setScope(name)` | `context.set('scope', name)` | `scope == 'name'` |
+| `enableScope(name)` | `context.set('scope.name', true)` | `scope.name` (truthy) |
+| `disableScope(name)` | `context.set('scope.name', false)` | `scope.name` (falsy) |
+| `toggleScope(name)` | Flip `scope.name` | — |
+
+Context values: `string | number | boolean`.
+
+## Single active scope
+
+The most common pattern — one scope at a time:
+
+```tsx
+function Editor() {
+  const { setScope } = useScope();
+
+  useShortcut({
+    id: 'bold',
+    keys: 'mod+b',
+    when: "scope == 'editor'",
+    handler: toggleBold,
+  });
+
+  return (
+    <div
+      tabIndex={0}
+      onFocus={() => setScope('editor')}
+      onBlur={() => setScope('global')}
+    />
+  );
+}
+```
+
+## Named scope flags
+
+Multiple independent flags:
+
+```tsx
+const { enableScope, disableScope } = useScope();
+
+// when: "scope.terminal"
+enableScope('terminal');
+
+// when: "scope.palette"
+enableScope('palette');
+
+disableScope('terminal');
+```
+
+## Arbitrary context keys
+
+```tsx
+const { set, remove } = useScope();
+
+set('readOnly', true);
+set('editor.langId', 'typescript');
+set('modalOpen', false);
+
+remove('readOnly');
+```
+
+Pair with `when` expressions:
+
+```ts
+when: "scope == 'editor' && !readOnly"
+when: "editor.langId == 'typescript'"
+when: "!modalOpen"
+```
+
+## React state vs context
+
+Context is the **source of truth for shortcut gating**. UI state can mirror it:
+
+```tsx
+const [scopeLabel, setScopeLabel] = useState('global');
+const { setScope } = useScope();
+
+onFocus={() => {
+  setScope('editor');
+  setScopeLabel('editor');
+}}
+```
+
+Or read from the engine:
+
+```tsx
+const engine = useEngine();
+const snapshot = engine.context.snapshot();
+// snapshot.scope === 'editor'
+```
+
+For reactive UI, subscribe:
+
+```tsx
+const engine = useEngine();
+const [, bump] = useReducer((n) => n + 1, 0);
+
+useEffect(() => engine.context.subscribe(bump), [engine]);
+```
+
+`useKeymap({ forContext: true })` already re-renders on context changes.
+
+## Modal pattern
+
+```tsx
+function Modal({ open, onClose }) {
+  const { set } = useScope();
+
+  useEffect(() => {
+    if (open) set('modalOpen', true);
+    else set('modalOpen', false);
+  }, [open, set]);
+
+  useShortcut({
+    id: 'modal.close',
+    keys: 'escape',
+    when: 'modalOpen',
+    handler: onClose,
+  });
+}
+```
+
+Background shortcuts should include `when: '!modalOpen'`.

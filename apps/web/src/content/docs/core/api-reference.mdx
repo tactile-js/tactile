@@ -1,0 +1,260 @@
+---
+title: Core API reference
+description: Complete API reference for @tactile-js/core — createKeybindingEngine, KeybindingRule, context store, keymap introspection, and lower-level helpers.
+---
+
+The core package is framework-agnostic. Most apps need `createKeybindingEngine` and the types; lower-level exports exist for custom adapters, inspectors, and settings UIs.
+
+## `createKeybindingEngine(options?)`
+
+Creates an engine instance. This is a **factory**, not a global singleton — each instance owns its own registry, context, and listeners.
+
+```ts
+import { createKeybindingEngine } from '@tactile-js/core';
+
+const kb = createKeybindingEngine({
+  defaultMatch: 'hybrid',
+  sequenceTimeout: 1000,
+  debug: false,
+});
+```
+
+Returns a `KeybindingEngine`. See [Engine options](/core/engine-options/) for every option.
+
+---
+
+## `KeybindingEngine`
+
+### `add(rule): () => void`
+
+Register a rule. Returns an **unbind** function.
+
+```ts
+const off = kb.add({
+  id: 'palette.open',
+  keys: 'mod+k',
+  when: "scope == 'global'",
+  group: 'Navigation',
+  description: 'Open command palette',
+  priority: 0,
+  handler: (event, info) => {
+    openPalette();
+    // return false to skip preventDefault()
+  },
+});
+
+off(); // unregister
+```
+
+### `context: ContextStore`
+
+The context-key store driving `when` expressions. See [Context & when expressions](/concepts/when-expressions/).
+
+```ts
+kb.context.set('scope', 'editor');
+kb.context.set('readOnly', false);
+kb.context.get('scope');        // 'editor'
+kb.context.has('readOnly');     // true
+kb.context.delete('readOnly');
+kb.context.assign({ scope: 'global', modalOpen: false });
+kb.context.snapshot();          // { scope: 'global', modalOpen: false }
+
+const unsub = kb.context.subscribe(() => {
+  console.log('context changed', kb.context.snapshot());
+});
+```
+
+### `getKeymap(): ResolvedBinding[]`
+
+Every registered rule with platform-formatted labels — the source of truth for help dialogs.
+
+```ts
+kb.getKeymap();
+// [{
+//   id: 'palette.open',
+//   keys: ['mod+k'],
+//   labels: ['⌘K'],           // or ['Ctrl+K'] on Windows/Linux
+//   when: "scope == 'global'",
+//   group: 'Navigation',
+//   description: 'Open command palette',
+//   priority: 0,
+// }]
+```
+
+### `getKeymapForContext(snapshot): ResolvedBinding[]`
+
+Like `getKeymap()`, but only rules whose `when` holds in the given snapshot.
+
+```ts
+const active = kb.getKeymapForContext(kb.context.snapshot());
+```
+
+### `getCollisions(): Collision[]`
+
+Rules competing for the same keystroke. See [Collision detection](/concepts/collisions/).
+
+### `recordShortcut(callback): () => void`
+
+Capture the next complete keystroke. Returns a stop function. Used for "press a key to rebind" UIs.
+
+```ts
+const stop = kb.recordShortcut(({ binding, label }) => {
+  console.log(binding); // 'ctrl+shift+k'
+  console.log(label);   // '⇧⌘K' on macOS
+});
+// stop(); // cancel without capturing
+```
+
+### `format(binding, platform?): string`
+
+Render a binding string as a display label.
+
+```ts
+kb.format('mod+shift+p'); // '⇧⌘P' on macOS, 'Ctrl+Shift+P' elsewhere
+```
+
+### `subscribeKeymap(listener): () => void`
+
+Notified when rules are added or removed.
+
+### `dispose(): void`
+
+Detach all listeners and reset internal state.
+
+---
+
+## `KeybindingRule`
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | *required* | Stable command id, e.g. `'palette.open'`. |
+| `keys` | `string \| string[]` | *required* | Binding string or alternatives. See [Key syntax](/concepts/key-syntax/). |
+| `handler` | `KeybindingHandler` | *required* | Called on match. Return `false` to skip `preventDefault`. |
+| `when` | `string` | — | Boolean expression over context keys. |
+| `priority` | `number` | `0` | Higher wins collisions. |
+| `group` | `string` | — | Category for help UIs. |
+| `description` | `string` | — | Human-readable label for help UIs. |
+| `match` | `'hybrid' \| 'physical' \| 'logical'` | engine default | Per-rule match mode override. |
+| `preventDefault` | `boolean \| (event) => boolean` | `true` | Whether to call `preventDefault` on match. |
+| `eventType` | `'keydown' \| 'keyup'` | `'keydown'` | Which event to listen on. |
+
+### `KeybindingHandler`
+
+```ts
+type KeybindingHandler = (
+  event: KeyEvent,
+  info: MatchInfo,
+) => void | boolean;
+```
+
+### `MatchInfo`
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | The matched rule's id. |
+| `keys` | `string` | The specific binding string that matched. |
+| `sequence` | `boolean` | `true` if match came from a multi-stroke sequence like `g i`. |
+
+---
+
+## Types
+
+### `KeyEvent`
+
+Structural subset of DOM `KeyboardEvent` — real browser events satisfy it; tests can pass plain objects.
+
+| Field | Type |
+| --- | --- |
+| `key` | `string` |
+| `code` | `string` |
+| `ctrlKey`, `shiftKey`, `altKey`, `metaKey` | `boolean` |
+| `repeat` | `boolean` (optional) |
+| `target` | `EventTarget \| null` (optional) |
+| `preventDefault` | `() => void` (optional) |
+
+### `ResolvedBinding`
+
+Output of `getKeymap()` — a rule plus presentation data.
+
+### `Collision`
+
+```ts
+interface Collision {
+  keys: string;
+  rules: Array<{ id: string; when?: string; priority: number }>;
+}
+```
+
+### `RecordedShortcut`
+
+```ts
+interface RecordedShortcut {
+  binding: string; // canonical, re-parseable: 'ctrl+shift+k'
+  label: string;   // display: '⇧⌘K'
+}
+```
+
+---
+
+## Lower-level helpers
+
+Exported for tooling and custom adapters:
+
+| Export | Purpose |
+| --- | --- |
+| `createDomSource(target?)` | Default DOM event source bound to `document`. |
+| `defaultIgnore(event)` | Default predicate that skips inputs and contenteditable. |
+| `ContextStore` | Standalone context store (also available as `engine.context`). |
+| `parseBinding(input, platform)` | Parse a binding string into chords. |
+| `formatBinding(binding, platform)` | Format a binding for display. |
+| `matchChord(chord, event, mode)` | Match a single chord against an event. |
+| `compileWhen(expression)` | Parse a `when` string into an AST (cached). |
+| `evaluateWhen(node, snapshot)` | Evaluate a compiled `when` AST. |
+| `matchWhen(expression, snapshot)` | Compile + evaluate in one call. |
+| `detectPlatform()` | `'mac'` or `'other'`. |
+| `resolveMod(platform)` | `'meta'` on Mac, `'ctrl'` elsewhere. |
+| `KeybindingParseError` | Thrown on invalid binding strings. |
+| `WhenExpressionError` | Thrown on invalid `when` expressions. |
+
+### Custom event source (non-DOM hosts)
+
+```ts
+import { createKeybindingEngine } from '@tactile-js/core';
+
+const kb = createKeybindingEngine({
+  source: {
+    on(type, listener) {
+      const handler = (e: KeyboardEvent) => listener(e);
+      window.addEventListener(type, handler);
+      return () => window.removeEventListener(type, handler);
+    },
+  },
+});
+```
+
+Use this for Electron, tests, or any host that can supply `KeyEvent` objects.
+
+---
+
+## Lifecycle pattern
+
+```ts
+const kb = createKeybindingEngine();
+
+// Register rules
+const rules = [
+  kb.add({ id: 'a', keys: 'mod+k', handler: a }),
+  kb.add({ id: 'b', keys: 'mod+s', handler: b }),
+];
+
+// Update context as UI state changes
+kb.context.set('scope', 'editor');
+
+// Introspect
+kb.getKeymap();
+kb.getCollisions();
+
+// Cleanup
+rules.forEach((off) => off());
+kb.dispose();
+```

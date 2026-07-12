@@ -28,16 +28,42 @@ function Editor() {
   useShortcut({
     id: 'palette.open',
     keys: 'mod+k', // ⌘K on macOS, Ctrl+K elsewhere
+    group: 'Navigation',
     description: 'Open command palette',
     handler: () => openPalette(),
   });
 
-  return <textarea />;
+  return <main />;
 }
 ```
 
-The handler is read through a ref, so passing a fresh closure every render does **not** re-register
-the binding — it always sees current state. No dependency-array juggling.
+The handler is read through a ref — passing a fresh closure every render does **not** re-register
+the binding. It always sees current state.
+
+### Scoped shortcut
+
+```tsx
+import { useShortcut, useScope } from '@tactile-js/react';
+
+function Editor() {
+  const { setScope } = useScope();
+
+  useShortcut({
+    id: 'editor.bold',
+    keys: 'mod+b',
+    when: "scope == 'editor'",
+    handler: () => toggleBold(),
+  });
+
+  return (
+    <div
+      tabIndex={0}
+      onFocus={() => setScope('editor')}
+      onBlur={() => setScope('global')}
+    />
+  );
+}
+```
 
 ## Vanilla / framework-agnostic
 
@@ -50,14 +76,24 @@ const off = kb.add({
   id: 'file.save',
   keys: 'mod+s',
   when: "scope == 'editor'",
+  group: 'File',
+  description: 'Save',
   handler: () => save(),
 });
 
-kb.context.set('scope', 'editor'); // gate rules on the active scope
+kb.context.set('scope', 'editor');
 
 off();          // unregister this rule
 kb.dispose();   // detach all listeners
 ```
 
-That's it. From here, the interesting parts are [Match modes](/concepts/matching/) (how Tactile stays
-correct across keyboard layouts) and [`when` expressions](/concepts/when-expressions/).
+## What to read next
+
+| Topic | Doc |
+| --- | --- |
+| `code` vs `key`, Dvorak, QWERTZ | [Match modes](/concepts/matching/) → [International keyboards](/concepts/international-keyboards/) |
+| Binding strings, sequences, `mod` | [Key syntax](/concepts/key-syntax/) |
+| Context gating | [When expressions](/concepts/when-expressions/) |
+| Full API | [Core API reference](/core/api-reference/) |
+| Real-world patterns | [Recipes](/guides/recipes/) |
+| Try live | [Playground](/playground/) |

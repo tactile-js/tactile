@@ -1,0 +1,184 @@
+---
+title: useShortcut
+description: Register keyboard shortcuts in React with useShortcut — stable handlers, when expressions, priority, and dependency control.
+---
+
+Registers a shortcut for the **lifetime of the calling component**. Automatically adds on mount and removes on unmount.
+
+```tsx
+import { useShortcut } from '@tactile-js/react';
+
+function Editor() {
+  useShortcut({
+    id: 'palette.open',
+    keys: 'mod+k',
+    when: "scope == 'editor'",
+    group: 'Navigation',
+    description: 'Open command palette',
+    priority: 0,
+    handler: () => setOpen(true),
+  });
+}
+```
+
+## Signature
+
+```ts
+function useShortcut(rule: KeybindingRule, deps?: unknown[]): void
+```
+
+Accepts any [`KeybindingRule`](/core/api-reference/#keybindingrule) field.
+
+## Stable handler (no stale closures)
+
+The handler is read through a **ref**, so passing a fresh closure every render does **not** re-register the binding:
+
+```tsx
+function Editor() {
+  const [count, setCount] = useState(0);
+
+  useShortcut({
+    id: 'increment',
+    keys: 'mod+i',
+    handler: () => setCount((c) => c + 1), // always sees latest setCount
+  });
+
+  return <span>{count}</span>;
+}
+```
+
+No dependency-array juggling for the handler itself.
+
+## When re-registration happens
+
+The binding re-registers only when these change:
+
+- `rule.id`
+- `rule.keys`
+- `rule.when`
+- `rule.eventType`
+- `rule.match`
+- Items in the optional `deps` array
+
+```tsx
+// Re-register when mode changes
+useShortcut(
+  {
+    id: 'action',
+    keys: mode === 'vim' ? 'j' : 'arrowdown',
+    handler: moveDown,
+  },
+  [mode],
+);
+```
+
+## Full rule example
+
+```tsx
+useShortcut({
+  id: 'file.save',
+  keys: ['mod+s', 'ctrl+s'],
+  when: "!readOnly && editorFocus",
+  group: 'File',
+  description: 'Save document',
+  priority: 5,
+  match: 'hybrid',
+  preventDefault: true,
+  eventType: 'keydown',
+  handler: (event, info) => {
+    console.log(info.id, info.keys, info.sequence);
+    save();
+    // return false to skip preventDefault
+  },
+});
+```
+
+## `when` gating
+
+Pair with [`useScope`](/react/use-scope/) or imperative context:
+
+```tsx
+const { setScope } = useScope();
+
+useShortcut({
+  id: 'editor.bold',
+  keys: 'mod+b',
+  when: "scope == 'editor'",
+  handler: () => toggleBold(),
+});
+
+<div
+  tabIndex={0}
+  onFocus={() => setScope('editor')}
+  onBlur={() => setScope('global')}
+/>
+```
+
+## Sequences
+
+```tsx
+useShortcut({
+  id: 'go.inbox',
+  keys: 'g i',
+  description: 'Go to inbox',
+  handler: () => navigate('/inbox'),
+});
+```
+
+## Collision override
+
+```tsx
+// Registered later + higher priority wins
+useShortcut({ id: 'default', keys: 'mod+k', handler: defaultAction });
+useShortcut({ id: 'override', keys: 'mod+k', priority: 10, handler: overrideAction });
+```
+
+## Conditional registration
+
+Don't conditionally call the hook — register always and gate with `when`:
+
+```tsx
+// ✅ Good
+useShortcut({
+  id: 'feature',
+  keys: 'mod+f',
+  when: 'featureEnabled',
+  handler: runFeature,
+});
+
+// ❌ Bad — breaks rules of hooks
+if (featureEnabled) {
+  useShortcut({ ... });
+}
+```
+
+Sync context instead:
+
+```tsx
+useEffect(() => {
+  if (featureEnabled) engine.context.set('featureEnabled', true);
+  else engine.context.delete('featureEnabled');
+}, [featureEnabled]);
+```
+
+Or use `deps` to change the `when` string:
+
+```tsx
+useShortcut(
+  {
+    id: 'feature',
+    keys: 'mod+f',
+    when: featureEnabled ? 'alwaysTrue' : 'alwaysFalse', // prefer real context keys
+    handler: runFeature,
+  },
+  [featureEnabled],
+);
+```
+
+Better pattern with context:
+
+```tsx
+const { set } = useScope();
+useEffect(() => set('featureEnabled', featureEnabled), [featureEnabled]);
+useShortcut({ id: 'feature', keys: 'mod+f', when: 'featureEnabled', handler: runFeature });
+```

@@ -1,0 +1,253 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+const title = 'Introducing Tactile — keyboard shortcuts done right';
+const description =
+  'Tactile is a context-aware keyboard shortcut engine for the web: layout-aware matching with event.code and event.key, VS Code-style when expressions, and first-class collision detection.';
+const date = '2026-07-10';
+---
+
+<Base title={title} description={description}>
+  <Nav />
+  <main class="post">
+    <header class="post__head">
+      <p class="eyebrow">// launch</p>
+      <h1 class="post__title">Introducing Tactile</h1>
+      <p class="post__meta">{date} · keyboard shortcuts for the web</p>
+      <p class="post__lede">
+        Most shortcut libraries on npm were built for a simpler web. They lean on deprecated
+        <code>keyCode</code>, treat context as an afterthought, and leave you to discover binding
+        conflicts in production. <strong>Tactile</strong> starts from a different place.
+      </p>
+    </header>
+
+    <article class="post__body">
+      <h2>The problem</h2>
+      <p>
+        If you've built a command palette, a shortcuts help dialog, or a scope-gated editor, you've
+        hit the same walls:
+      </p>
+      <ul>
+        <li>
+          <strong>Layouts break shortcuts.</strong> On German QWERTZ, the physical Z key types "y".
+          Libraries that match on <code>event.key</code> alone break undo. Libraries on
+          <code>keyCode</code> are deprecated and still wrong in subtler ways.
+        </li>
+        <li>
+          <strong>Context is duct tape.</strong> <code>if (editorFocused && !modalOpen)</code> scattered
+          across handlers doesn't scale. You want declarative gating — the way VS Code does it.
+        </li>
+        <li>
+          <strong>Collisions are silent.</strong> Two components register <code>mod+k</code>. One wins.
+          Which one? Why? Good luck.
+        </li>
+      </ul>
+
+      <h2>What Tactile is</h2>
+      <p>
+        Tactile is a small, framework-agnostic keyboard shortcut <em>engine</em> with a React adapter.
+        It's modeled on VS Code's keybinding system — not a thin wrapper around <code>addEventListener</code>.
+      </p>
+
+      <pre class="code"><code>{`import { createKeybindingEngine } from '@tactile-js/core';
+
+const kb = createKeybindingEngine();
+
+kb.add({
+  id: 'palette.open',
+  keys: 'mod+k',
+  when: "scope == 'global'",
+  group: 'Navigation',
+  description: 'Open command palette',
+  handler: () => openPalette(),
+});`}</code></pre>
+
+      <p>Two packages:</p>
+      <ul>
+        <li><code>@tactile-js/core</code> — the engine. No React required.</li>
+        <li><code>@tactile-js/react</code> — <code>KeybindProvider</code>, <code>useShortcut</code>, <code>useScope</code>, <code>useKeymap</code>, <code>useShortcutRecorder</code>.</li>
+      </ul>
+
+      <h2>Layout-aware matching (the important part)</h2>
+      <p>
+        Tactile matches on <code>event.code</code> <em>and</em> <code>event.key</code> — never
+        <code>keyCode</code>. The default <strong>hybrid</strong> mode:
+      </p>
+      <ul>
+        <li><strong>Letters & digits</strong> → physical keycap position (<code>event.code</code>)</li>
+        <li><strong>Symbols & named keys</strong> → character / logical key (<code>event.key</code>)</li>
+      </ul>
+      <p>
+        So <code>mod+z</code> undo fires on the Z keycap on QWERTZ (even though it types "y"), and
+        <code>?</code> matches the glyph internationally. This is the same convention VS Code uses —
+        we verified it against their codebase.
+      </p>
+      <p>
+        On Dvorak, <code>⌘K</code> means the K keycap, not the key that types "k". That's intentional.
+        We document it honestly and offer <code>match: 'logical'</code> when you need character-based matching.
+      </p>
+
+      <h2>When expressions, not flags</h2>
+      <pre class="code"><code>{`kb.add({
+  keys: 'mod+b',
+  when: "scope == 'editor' && !readOnly",
+  handler: toggleBold,
+});`}</code></pre>
+      <p>
+        Scopes are just context keys. No parallel concept to learn. In React,
+        <code>useScope()</code> is sugar over <code>engine.context.set()</code>.
+      </p>
+
+      <h2>Collisions are first-class</h2>
+      <pre class="code"><code>{`kb.getCollisions();
+// [{ keys: 'mod+k', rules: [{ id: 'a' }, { id: 'b' }] }]`}</code></pre>
+      <p>
+        At runtime, higher <code>priority</code> wins; ties go to the most recently registered rule.
+        Same model as VS Code.
+      </p>
+
+      <h2>Introspection built in</h2>
+      <p>
+        <code>getKeymap()</code> returns every binding with platform-formatted labels (<code>⌘K</code> /
+        <code>Ctrl+K</code>). Build a shortcuts dialog from it — the UI can't drift from what's
+        actually registered.
+      </p>
+
+      <h2>Try it</h2>
+      <div class="post__cta">
+        <a class="btn btn--primary" href="/playground/">Open the playground →</a>
+        <a class="btn" href="/getting-started/introduction/">Read the docs</a>
+        <a class="btn" href="https://github.com/tactile-js/tactile">GitHub</a>
+      </div>
+
+      <pre class="code"><code>npm install @tactile-js/react</code></pre>
+
+      <h2>What's next</h2>
+      <p>
+        Tactile is early — pre-1.0, API settling. Vue and Svelte adapters are on the roadmap. If you
+        try it, file issues, or tell us what breaks on your layout, we'll listen.
+      </p>
+      <p>
+        Keyboard shortcuts on the web will never be perfect. OS-reserved keys, IME composition, and
+        layout label drift are hard problems. Tactile handles the common cases correctly, documents
+        the rest, and gives you an engine that scales past five global hotkeys.
+      </p>
+      <p class="post__sign">— Lohith Mallikarjun</p>
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .post {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--green-dim);
+    margin: 0 0 1rem;
+  }
+  .post__title {
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.5rem;
+    line-height: 1.1;
+  }
+  .post__meta {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-mute);
+    margin: 0 0 1.5rem;
+  }
+  .post__lede {
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin: 0 0 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .post__body h2 {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 2.5rem 0 1rem;
+  }
+  .post__body p,
+  .post__body li {
+    color: var(--text-dim);
+    line-height: 1.65;
+    margin: 0 0 1rem;
+  }
+  .post__body ul {
+    padding-left: 1.25rem;
+    margin: 0 0 1.5rem;
+  }
+  .post__body strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .post__body code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--green);
+  }
+  .code {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin: 0 0 1.5rem;
+  }
+  .code code {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    white-space: pre;
+  }
+  .post__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.5rem 0 2rem;
+  }
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: 0.7rem 1.25rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .btn:hover {
+    border-color: var(--text-dim);
+  }
+  .btn--primary {
+    background: var(--green);
+    color: #05271a;
+    border-color: var(--green);
+    font-weight: 500;
+  }
+  .btn--primary:hover {
+    background: var(--green-bright);
+    border-color: var(--green-bright);
+  }
+  .post__sign {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-mute);
+    font-style: italic;
+  }
+</style>

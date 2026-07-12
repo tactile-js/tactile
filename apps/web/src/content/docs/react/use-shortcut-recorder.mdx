@@ -1,0 +1,96 @@
+---
+title: useShortcutRecorder
+description: Capture keyboard shortcuts for rebinding UIs with useShortcutRecorder — press-a-key-to-record flow with binding string and display label.
+---
+
+Hook wrapper around `engine.recordShortcut()` — the building block for settings pages where users press a key to set a new shortcut.
+
+```tsx
+import { useShortcutRecorder } from '@tactile-js/react';
+
+const { isRecording, combo, start, stop } = useShortcutRecorder();
+```
+
+## API
+
+| Field / method | Type | Description |
+| --- | --- | --- |
+| `isRecording` | `boolean` | Whether listening for the next keystroke. |
+| `combo` | `RecordedShortcut \| null` | Last captured shortcut, or `null` before first capture. |
+| `start()` | `() => void` | Begin listening. Resolves on next complete keystroke. |
+| `stop()` | `() => void` | Cancel without capturing. |
+
+## `RecordedShortcut`
+
+```ts
+{
+  binding: string; // canonical: 'ctrl+shift+k' — save this to settings
+  label: string;   // display: '⇧⌘K' on macOS
+}
+```
+
+## Basic UI
+
+```tsx
+function RebindButton() {
+  const { isRecording, combo, start, stop } = useShortcutRecorder();
+
+  return (
+    <div>
+      <button onClick={isRecording ? stop : start}>
+        {isRecording ? 'Press any combination…' : 'Change shortcut'}
+      </button>
+      {combo && (
+        <p>
+          <kbd>{combo.label}</kbd>
+          <span>({combo.binding})</span>
+        </p>
+      )}
+    </div>
+  );
+}
+```
+
+## Save to settings
+
+```tsx
+function ShortcutSettings() {
+  const engine = useEngine();
+  const { combo, start } = useShortcutRecorder();
+  const [binding, setBinding] = useState('mod+s');
+
+  const save = () => {
+    if (!combo) return;
+    if (wouldCollide(engine, combo.binding)) {
+      alert('That shortcut is already in use');
+      return;
+    }
+    setBinding(combo.binding);
+    persistSettings(combo.binding);
+  };
+
+  return (
+    <>
+      <p>Current: <kbd>{engine.format(binding)}</kbd></p>
+      <button onClick={start}>Record new</button>
+      {combo && <button onClick={save}>Save {combo.label}</button>}
+    </>
+  );
+}
+```
+
+## Behavior details
+
+- **Lone modifier presses are ignored** — waits for a "real" key to complete the combo.
+- **`preventDefault` is called** during recording so the key doesn't trigger other shortcuts.
+- **Cleans up on unmount** — in-progress recording is cancelled if the component unmounts.
+- **Calling `start()` again** cancels any previous recording session.
+
+## Core equivalent
+
+```ts
+const stop = kb.recordShortcut(({ binding, label }) => {
+  console.log(binding, label);
+});
+// stop(); // cancel
+```

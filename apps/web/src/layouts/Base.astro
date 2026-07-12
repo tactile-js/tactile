@@ -9,8 +9,14 @@ interface Props {
   description: string;
   image?: string;
   jsonLd?: Record<string, unknown>;
+  /**
+   * When true, the page participates in the light/dark theme shared with the
+   * docs (same `starlight-theme` localStorage key). When false, the page stays
+   * pitch black — the brand surface (landing).
+   */
+  themeable?: boolean;
 }
-const { title, description, image, jsonLd } = Astro.props;
+const { title, description, image, jsonLd, themeable = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -20,6 +26,18 @@ const { title, description, image, jsonLd } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <Seo title={title} description={description} image={image} jsonLd={jsonLd} />
+    {
+      themeable && (
+        <script is:inline>{`
+          try {
+            var t = localStorage.getItem('starlight-theme');
+            document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark';
+          } catch (e) {
+            document.documentElement.dataset.theme = 'dark';
+          }
+        `}</script>
+      )
+    }
   </head>
   <body>
     <slot />

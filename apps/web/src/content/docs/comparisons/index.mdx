@@ -1,0 +1,50 @@
+---
+title: 'JavaScript keyboard shortcut libraries compared'
+sidebar:
+  label: All libraries compared
+  order: 0
+description: Mousetrap vs hotkeys-js vs tinykeys vs react-hotkeys-hook vs Tactile — sizes, key models, context/scopes, collision detection, and maintenance, compared honestly.
+---
+
+There are many good keyboard shortcut libraries. This page compares the widely used ones honestly —
+including where they beat Tactile — so you can pick the right tool.
+
+## At a glance
+
+| Library | Size (min+gz) | Key model | Context / scopes | Collisions | Sequences | Recording | Core w/o framework |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Tactile** | ~5.5 kB | `key` + `code` (hybrid) | `when` expressions | detected + priority | ✅ | ✅ | ✅ |
+| [Mousetrap](/comparisons/vs-mousetrap/) | ~2.2 kB | `keyCode` (deprecated) | ✗ (plugin) | ✗ | ✅ | ✗ | ✅ |
+| [hotkeys-js](/comparisons/vs-hotkeys-js/) | ~2.6 kB | `keyCode` (deprecated) | named scopes | ✗ | ✗ | ✗ | ✅ |
+| [tinykeys](/comparisons/vs-tinykeys/) | **~0.7 kB** | `key` or `code` | ✗ | ✗ | ✅ | ✗ | ✅ |
+| [keymaster](/comparisons/vs-keymaster/) | ~1.5 kB | `keyCode` (deprecated) | named scopes | ✗ | ✗ | ✗ | ✅ |
+| [react-hotkeys-hook](/comparisons/vs-react-hotkeys-hook/) | ~3 kB | string parsing | named scopes | ✗ | ✅ | ✅ | ✗ (React) |
+| [react-hotkeys](/comparisons/vs-react-hotkeys/) | ~12 kB | Mousetrap-style | focus tree | ✗ | ✅ | ✅ | ✗ (React) |
+| [@github/hotkey](/comparisons/vs-github-hotkey/) | ~2 kB | `key`-ish | ✗ | ✗ | ✅ | ✗ | ✅ (DOM attrs) |
+| [Combokeys](/comparisons/vs-combokeys/) | ~3.3 kB | `keyCode` (deprecated) | wrapper pkg | ✗ | ✅ | ✗ | ✅ |
+
+Sizes are approximate, from each package's published bundle.
+
+## How to read this
+
+- **If you need the smallest possible bundle** and a handful of global shortcuts: use
+  [tinykeys](/comparisons/vs-tinykeys/). It's excellent, modern, and 8× smaller than Tactile.
+- **If you're maintaining an app that already uses Mousetrap/keymaster/hotkeys-js** and it works:
+  keep it. Migrate when layout bugs, scope sprawl, or conflicts start costing you time.
+- **If shortcuts are a product feature** — command palettes, per-context bindings, user rebinding,
+  a help dialog, international users — that's the territory Tactile was built for: a layout-aware
+  key model (`event.key` + `event.code`, never `keyCode`), VS Code-style
+  [`when` expressions](/concepts/when-expressions/), first-class
+  [collision detection](/concepts/collisions/), and [introspection](/react/use-keymap/) for
+  help UIs, in a framework-agnostic core with React hooks.
+
+## The keyCode problem, briefly
+
+Mousetrap, hotkeys-js, keymaster, and Combokeys were all built on `KeyboardEvent.keyCode`, which is
+deprecated and inconsistent on non-US layouts (QWERTZ, AZERTY, Dvorak). See
+[event.key vs event.code](/concepts/matching/) for the details and how the hybrid model fixes it.
+
+## Next steps
+
+- [Quick start](/getting-started/quick-start/) — first shortcut in under a minute
+- [Playground](/playground/) — operate a mini app with Tactile before installing

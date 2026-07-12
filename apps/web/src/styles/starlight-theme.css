@@ -137,20 +137,28 @@
   }
 }
 
-/* ── Desktop sidebar collapse (icon rail) ───────────────────────── */
+/* ── Desktop sidebar collapse (fully hidden + floating pill) ────── */
+/* Collapsing to 0 also keeps the right TOC healthy: Starlight derives its
+   width from --sl-sidebar-width via max(), which a 3.5rem rail used to starve. */
 @media (min-width: 50rem) {
   html[data-tj-sidebar] {
-    --sl-sidebar-width: 3.5rem;
+    --sl-sidebar-width: 0rem;
   }
-  html[data-tj-sidebar] .sidebar-pane .sidebar-content {
-    align-items: center;
-    padding-inline: 0.5rem;
+  html[data-tj-sidebar] .sidebar-pane {
+    visibility: hidden;
     overflow: hidden;
+  }
+  /* The Pagefind modal must stay usable when opened from the pill. */
+  html[data-tj-sidebar] .sidebar-pane dialog[open] {
+    visibility: visible;
   }
 }
 @media (min-width: 50rem) and (prefers-reduced-motion: no-preference) {
   .sidebar-pane {
-    transition: width 0.25s ease;
+    /* visibility interpolates discretely: stays visible until the slide ends. */
+    transition:
+      width 0.25s ease,
+      visibility 0.25s;
   }
   .main-frame {
     transition: padding-inline-start 0.25s ease;
@@ -226,25 +234,58 @@
   }
 }
 
-/* ── Right "On this page" rail: half the visual weight ──────────── */
+/* ── Right "On this page" rail: pinned width, blaze-slider style ── */
+/* Explicit widths on BOTH the container and the fixed inner pane so the rail
+   can never be starved by the sidebar-width formula, in either sidebar state. */
 @media (min-width: 72rem) {
   .right-sidebar-container {
-    width: 14rem;
+    width: 15rem;
+  }
+  .right-sidebar {
+    width: 15rem;
   }
 }
 .right-sidebar {
   padding-top: 1.5rem;
+  border-inline-start: none;
 }
 .right-sidebar-panel h2 {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
   color: var(--sl-color-gray-3);
 }
-.right-sidebar-panel starlight-toc a,
+.right-sidebar-panel h2::before {
+  content: '☰';
+  font-size: 0.85em;
+  line-height: 1;
+}
+/* Items sit on a continuous 2px track; the active item lights its segment. */
+starlight-toc ul {
+  border-inline-start: 2px solid var(--sl-color-hairline);
+}
+starlight-toc ul ul {
+  border-inline-start: none;
+}
 starlight-toc a {
   font-size: 0.8rem;
-  padding-block: 0.15rem;
+  padding-block: 0.25rem;
+  margin-inline-start: -2px;
+  border-inline-start: 2px solid transparent;
+  border-radius: 0;
+  color: var(--sl-color-gray-3);
+}
+starlight-toc a:hover {
+  color: var(--sl-color-white);
+}
+starlight-toc a[aria-current='true'] {
+  border-inline-start-color: var(--sl-color-text-accent);
+  color: var(--sl-color-white);
+  font-weight: 500;
+  background: transparent;
 }

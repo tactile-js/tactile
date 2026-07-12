@@ -1,0 +1,58 @@
+---
+title: 'Tactile vs keymaster'
+sidebar:
+  label: vs keymaster
+description: keymaster alternative — keymaster is unmaintained and keyCode-based; Tactile is its spiritual successor with layout-aware matching, composable when-expressions, and collision detection.
+---
+
+[keymaster](https://www.npmjs.com/package/keymaster) pioneered elegant minimal shortcuts
+(`key('⌘+shift+k', handler)`) and simple named scopes. It's also **effectively unmaintained**
+(no release in roughly a decade) and built on the deprecated `keyCode`. If you're here, you're
+probably migrating.
+
+## At a glance
+
+| | keymaster | Tactile |
+| --- | --- | --- |
+| Maintenance | dormant for ~10 years | active |
+| Key model | `keyCode` (deprecated) | `event.key` + `event.code`, [hybrid](/concepts/matching/) |
+| Scopes | `key.setScope('issues')` | [`when` expressions](/concepts/when-expressions/) |
+| Filter | global `key.filter` | per-engine [`ignore`](/core/engine-options/#ignore-event-keyevent--boolean) |
+| Query pressed state | `key.isPressed(77)` (by keyCode!) | not exposed — rules + context instead |
+| Sequences | ✗ | ✅ `'g i'` |
+| Conflicts | ✗ | [detected + priority](/concepts/collisions/) |
+
+## Migration
+
+keymaster's scope model maps directly onto a context key:
+
+```js
+// keymaster
+key('⌘+k, ctrl+k', openPalette);
+key('j', 'issues', nextIssue);
+key.setScope('issues');
+key.unbind('j', 'issues');
+```
+
+```ts
+// Tactile
+const kb = createKeybindingEngine();
+
+kb.add({ id: 'palette', keys: 'mod+k', handler: openPalette }); // one string, both OSes
+const off = kb.add({ id: 'next', keys: 'j', when: "scope == 'issues'", handler: nextIssue });
+kb.context.set('scope', 'issues'); // replaces key.setScope
+off(); // replaces key.unbind
+```
+
+Notes:
+
+- `⌘+k, ctrl+k` alternatives collapse into the single `mod+k` alias.
+- keymaster's `key.filter` (which you had to override to allow shortcuts in inputs) becomes the
+  documented `ignore` option.
+- `isPressed`-style polling has no direct equivalent; model modes as
+  [context keys](/concepts/when-expressions/) instead — it's declarative and introspectable.
+
+## Next steps
+
+- [Installation](/getting-started/installation/) · [Quick start](/getting-started/quick-start/)
+- [All libraries compared](/comparisons/)

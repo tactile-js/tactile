@@ -1,0 +1,56 @@
+---
+title: 'Tactile vs Combokeys'
+sidebar:
+  label: vs Combokeys
+description: Combokeys is the instanced Mousetrap fork; it kept the keyCode key model. Tactile offers per-instance engines with layout-aware matching, when-expressions, and collision detection.
+---
+
+[Combokeys](https://www.npmjs.com/package/combokeys) forked Mousetrap to fix its two architectural
+complaints: it's a constructor (`new Combokeys(element)`) instead of a global singleton, and it
+binds to any element instead of assuming `document`. Both were the right calls — and Tactile makes
+the same ones. What Combokeys kept from Mousetrap is the deprecated `keyCode` matching and the
+plugin-based context story (`combokeys-context` is a separate wrapper package).
+
+## At a glance
+
+| | Combokeys | Tactile |
+| --- | --- | --- |
+| Instances | ✅ `new Combokeys(el)` | ✅ `createKeybindingEngine({ source })` |
+| Bind target | any element | any element via [`createDomSource(target)`](/core/engine-options/#source-keyeventsource) |
+| Key model | `keyCode` (deprecated, from Mousetrap) | `event.key` + `event.code`, [hybrid](/concepts/matching/) |
+| Context / scopes | separate `combokeys-context` wrapper | [`when` expressions](/concepts/when-expressions/) built in |
+| Conflicts | ✗ | [detected + priority](/concepts/collisions/) |
+| Sequences | ✅ | ✅ |
+
+## Migration
+
+Instance-for-instance, the mapping is direct:
+
+```js
+// Combokeys
+const combokeys = new Combokeys(document.querySelector('#editor'));
+combokeys.bind('mod+b', toggleBold);
+combokeys.detach();
+```
+
+```ts
+// Tactile — engine scoped to the same element
+import { createKeybindingEngine, createDomSource } from '@tactile-js/core';
+
+const kb = createKeybindingEngine({
+  source: createDomSource(document.querySelector('#editor')!),
+});
+kb.add({ id: 'bold', keys: 'mod+b', handler: toggleBold });
+kb.dispose(); // replaces detach()
+```
+
+One conceptual upgrade worth making during migration: element-scoped *engines* are often better
+modeled as one app-wide engine with element-scoped *rules* — focus sets a context key, rules carry
+`when: "scope == 'editor'"`. You get one keymap, one help dialog, and collision detection across
+the whole app. See [useScope](/react/use-scope/) for the React version.
+
+## Next steps
+
+- [Installation](/getting-started/installation/) · [Quick start](/getting-started/quick-start/)
+- [Tactile vs Mousetrap](/comparisons/vs-mousetrap/) — the upstream comparison
+- [All libraries compared](/comparisons/)

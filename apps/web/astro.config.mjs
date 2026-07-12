@@ -27,6 +27,7 @@ export default defineConfig({
       // sidebar), collapsible sidebar rail, and a light/dark switch instead of
       // the three-way dropdown.
       components: {
+        Head: './src/components/starlight/Head.astro',
         Header: './src/components/starlight/Header.astro',
         Sidebar: './src/components/starlight/Sidebar.astro',
         ThemeSelect: './src/components/starlight/ThemeSwitch.astro',
@@ -52,21 +53,48 @@ export default defineConfig({
         },
       },
       // Groups are collapsed by default (Starlight auto-expands the group that
-      // contains the current page, so context is never lost).
+      // contains the current page). Items are explicitly ordered — autogenerate
+      // sorts alphabetically, which put Installation before Introduction.
       sidebar: [
         {
           label: 'Getting started',
           collapsed: true,
-          items: [{ autogenerate: { directory: 'getting-started' } }],
+          items: [
+            'getting-started/introduction',
+            'getting-started/installation',
+            'getting-started/quick-start',
+          ],
         },
-        { label: 'Core API', collapsed: true, items: [{ autogenerate: { directory: 'core' } }] },
         {
           label: 'Core concepts',
           collapsed: true,
-          items: [{ autogenerate: { directory: 'concepts' } }],
+          items: [
+            'concepts/key-syntax',
+            'concepts/matching',
+            'concepts/international-keyboards',
+            'concepts/when-expressions',
+            'concepts/collisions',
+            'concepts/limitations',
+          ],
         },
-        { label: 'Guides', collapsed: true, items: [{ autogenerate: { directory: 'guides' } }] },
-        { label: 'React', collapsed: true, items: [{ autogenerate: { directory: 'react' } }] },
+        {
+          label: 'React',
+          collapsed: true,
+          items: [
+            'react/overview',
+            'react/keybind-provider',
+            'react/use-shortcut',
+            'react/use-scope',
+            'react/use-keymap',
+            'react/use-shortcut-recorder',
+          ],
+        },
+        {
+          label: 'Core API',
+          collapsed: true,
+          items: ['core/api-reference', 'core/engine-options'],
+        },
+        { label: 'Guides', collapsed: true, items: ['guides/recipes'] },
         {
           label: 'Comparisons',
           collapsed: true,
@@ -77,6 +105,7 @@ export default defineConfig({
           collapsed: true,
           items: [
             { label: 'Playground', link: '/playground/' },
+            { label: 'Key inspector', link: '/tools/key-inspector/' },
             { label: 'Launch blog post', link: '/blog/introducing-tactile/' },
           ],
         },

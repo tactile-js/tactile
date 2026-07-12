@@ -216,23 +216,8 @@ Exported for tooling and custom adapters:
 | `KeybindingParseError` | Thrown on invalid binding strings. |
 | `WhenExpressionError` | Thrown on invalid `when` expressions. |
 
-### Custom event source (non-DOM hosts)
-
-```ts
-import { createKeybindingEngine } from '@tactile-js/core';
-
-const kb = createKeybindingEngine({
-  source: {
-    on(type, listener) {
-      const handler = (e: KeyboardEvent) => listener(e);
-      window.addEventListener(type, handler);
-      return () => window.removeEventListener(type, handler);
-    },
-  },
-});
-```
-
-Use this for Electron, tests, or any host that can supply `KeyEvent` objects.
+For non-DOM hosts (Electron, tests), inject a custom event source — see
+[Engine options → `source`](/core/engine-options/#source-keyeventsource).
 
 ---
 
@@ -258,3 +243,9 @@ kb.getCollisions();
 rules.forEach((off) => off());
 kb.dispose();
 ```
+
+## Next steps
+
+- [Engine options](/core/engine-options/) — every constructor option in depth
+- [Key syntax](/concepts/key-syntax/) — everything `keys` accepts
+- [Recipes](/guides/recipes/) — the API applied to palettes, help dialogs, and rebinding UIs

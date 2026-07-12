@@ -30,7 +30,7 @@ See [International keyboards](/concepts/international-keyboards/).
 
 `format()` and `getKeymap().labels` show labels derived from the **binding string** (`⌘K` for `mod+k`). They do not automatically show what a keycap types on Dvorak or AZERTY.
 
-VS Code solves this with layout-aware labels + warnings. Tactile keeps labels simpler — note the convention in your help UI if needed.
+VS Code solves this with layout-aware labels + warnings. Tactile keeps labels simpler — see [International keyboards](/concepts/international-keyboards/) for the convention to note in your help UI.
 
 ## Symbols in `physical` mode
 
@@ -38,7 +38,7 @@ Most punctuation has a layout-dependent `code`. In `physical` mode, symbol token
 
 ## Form fields
 
-By default, shortcuts don't fire while typing in `input`, `textarea`, `select`, or `contenteditable`. Override with `EngineOptions.ignore`.
+By default, shortcuts don't fire while typing in `input`, `textarea`, `select`, or `contenteditable`. Strategies for overriding this live in [Engine options → `ignore`](/core/engine-options/#ignore-event-keyevent--boolean).
 
 If you disable the ignore predicate, you must gate shortcuts with `when` expressions (e.g. `!textInputFocus`) — the VS Code approach.
 

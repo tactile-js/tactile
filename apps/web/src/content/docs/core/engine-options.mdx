@@ -40,15 +40,8 @@ The engine calls `source.on('keydown', …)` and `source.on('keyup', …)` once 
 
 ## `defaultMatch?: MatchMode`
 
-Default match strategy for rules that don't set their own `match`. Defaults to `'hybrid'`.
-
-| Mode | Behavior |
-| --- | --- |
-| `'hybrid'` | Letters/digits → `event.code`; symbols/named keys → `event.key` |
-| `'physical'` | Always `event.code` (symbols fall back to `event.key`) |
-| `'logical'` | Always `event.key` |
-
-See [Match modes](/concepts/matching/) and [International keyboards](/concepts/international-keyboards/).
+Default match strategy for rules that don't set their own `match`. Defaults to `'hybrid'`. The full
+mode-by-key-type behavior table lives in [Match modes](/concepts/matching/).
 
 ```ts
 // Character-based matching for every rule
@@ -147,3 +140,9 @@ const kb = createKeybindingEngine({ debug: true });
 ```
 
 Useful during development. Disable in production.
+
+## Next steps
+
+- [Core API reference](/core/api-reference/) — every method on the engine
+- [Match modes](/concepts/matching/) — what `defaultMatch` actually controls
+- [Recipes](/guides/recipes/) — these options applied to real UI patterns

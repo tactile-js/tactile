@@ -1,0 +1,62 @@
+---
+title: 'Tactile vs Mousetrap: a modern Mousetrap alternative'
+sidebar:
+  label: vs Mousetrap
+description: Mousetrap alternative for 2026 — Tactile replaces keyCode-based matching with a layout-aware model, adds when-expression scoping and collision detection. Migration guide included.
+---
+
+[Mousetrap](https://craig.is/killing/mice) defined the string-binding style every library since has
+copied (`'ctrl+shift+k'`, `'g i'` sequences, the Konami code demo). It's tiny, dependency-free, and
+battle-tested — and it's showing its age: it matches on the deprecated `keyCode`, has no built-in
+scopes, and has seen little maintenance in years.
+
+## At a glance
+
+| | Mousetrap | Tactile |
+| --- | --- | --- |
+| Key model | `event.which`/`keyCode` (deprecated) | `event.key` + `event.code`, [hybrid](/concepts/matching/) |
+| International layouts | breaks (QWERTZ/AZERTY/Dvorak) | layout-aware by design |
+| Scopes / context | none (`mousetrap-global-bind` plugin for inputs) | [`when` expressions](/concepts/when-expressions/) |
+| Conflicts | silent | [detected + priority](/concepts/collisions/) |
+| Sequences | ✅ `'g i'` | ✅ `'g i'` |
+| Inputs/textarea | skipped, plugin to override | skipped, [per-engine `ignore`](/core/engine-options/#ignore-event-keyevent--boolean) |
+| Size | ~2.2 kB | ~5.5 kB |
+
+## Where Mousetrap still wins
+
+Size and ubiquity. If you have three global shortcuts on a US-layout-only internal tool, Mousetrap
+(or [tinykeys](/comparisons/vs-tinykeys/)) is plenty.
+
+## Migration
+
+The binding syntax is nearly identical — most strings port unchanged:
+
+```js
+// Mousetrap
+Mousetrap.bind('mod+k', openPalette);
+Mousetrap.bind('g i', goToInbox);
+Mousetrap.unbind('mod+k');
+```
+
+```ts
+// Tactile
+import { createKeybindingEngine } from '@tactile-js/core';
+const kb = createKeybindingEngine();
+
+const off = kb.add({ id: 'palette', keys: 'mod+k', handler: openPalette });
+kb.add({ id: 'inbox', keys: 'g i', handler: goToInbox });
+off(); // unbind
+```
+
+Differences to watch:
+
+- Tactile rules need a stable `id` (it powers collisions, introspection, and help dialogs).
+- `Mousetrap.bindGlobal` (the plugin for shortcuts inside inputs) becomes a custom
+  [`ignore` predicate](/core/engine-options/#ignore-event-keyevent--boolean) — no plugin.
+- Letters match the **physical keycap** by default (what `keyCode` users expect on US layouts, but
+  correct everywhere else too).
+
+## Next steps
+
+- [Installation](/getting-started/installation/) · [Quick start](/getting-started/quick-start/)
+- [All libraries compared](/comparisons/)

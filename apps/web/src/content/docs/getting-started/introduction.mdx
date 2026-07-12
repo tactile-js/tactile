@@ -1,5 +1,7 @@
 ---
-title: Introduction
+title: 'Tactile: a JavaScript keyboard shortcut library'
+sidebar:
+  label: Introduction
 description: Tactile is a modern, context-aware keyboard shortcut engine for the web — layout-aware matching, when-expressions, and collision detection, with a framework-agnostic core and React hooks.
 ---
 
@@ -47,5 +49,39 @@ The API is settling but not yet 1.0. Pin versions in production and watch the [c
 | Build a command palette or help dialog | [Recipes](/guides/recipes/) |
 | See every API option | [Core API](/core/api-reference/) → [Engine options](/core/engine-options/) |
 | Try it in the browser | [Playground](/playground/) |
+
+## FAQ
+
+### How do I add keyboard shortcuts to a JavaScript app?
+
+Install `@tactile-js/core`, create an engine with `createKeybindingEngine()`, and register rules
+with `kb.add({ id, keys, handler })`. React apps can use the [`useShortcut`](/react/use-shortcut/)
+hook from `@tactile-js/react` instead. See the [Quick start](/getting-started/quick-start/).
+
+### How do I support ⌘ on Mac and Ctrl on Windows with one binding?
+
+Use the `mod` alias: `keys: 'mod+k'` resolves to ⌘K on macOS and Ctrl+K on Windows and Linux — one
+binding string for every platform. See [Key syntax](/concepts/key-syntax/).
+
+### Why do keyboard shortcuts break on international keyboard layouts?
+
+Most libraries rely on the deprecated `keyCode`, which maps inconsistently across layouts like
+QWERTZ, AZERTY, and Dvorak. Tactile matches on `event.key` *and* `event.code` with a hybrid
+strategy — ⌘Z stays on the physical Z key while symbols like `?` match the character. See
+[Match modes](/concepts/matching/).
+
+### How do I stop shortcuts from firing while the user types in an input?
+
+By default Tactile ignores key events from `input`, `textarea`, `select`, and `contenteditable`
+elements. The [`ignore` option](/core/engine-options/#ignore-event-keyevent--boolean) lets you allow
+specific shortcuts through or disable the behavior entirely.
+
+### What happens when two shortcuts use the same key combination?
+
+Tactile detects collisions at registration time via `getCollisions()` and resolves them at runtime
+by priority, then registration order — the same precedence model VS Code uses. See
+[Collision detection](/concepts/collisions/).
+
+---
 
 Ready? Head to [Installation](/getting-started/installation/).

@@ -1,0 +1,62 @@
+---
+title: 'Tactile vs tinykeys'
+sidebar:
+  label: vs tinykeys
+description: tinykeys vs Tactile compared honestly — tinykeys wins on size (~700 bytes); Tactile adds when-expression context, collision detection, recording, and keymap introspection.
+---
+
+[tinykeys](https://www.npmjs.com/package/tinykeys) is the best minimal shortcut library: modern
+(`event.key`/`event.code`, no `keyCode`), sequences included, ~700 bytes. If your needs stop at
+"bind some shortcuts," **use tinykeys and don't look back** — this page exists for when your needs
+don't stop there.
+
+## At a glance
+
+| | tinykeys | Tactile |
+| --- | --- | --- |
+| Size | **~0.7 kB** — 8× smaller | ~5.5 kB |
+| Key model | modern (`key`, `code` via `$mod`, explicit) | modern, [hybrid policy per token](/concepts/matching/) |
+| Cross-platform modifier | `$mod` | `mod` |
+| Sequences | ✅ `"g i"` | ✅ `'g i'` |
+| Context / scopes | ✗ — gate in your handlers | [`when` expressions](/concepts/when-expressions/) |
+| Conflicts | ✗ — both handlers fire | [detected; one winner by priority](/concepts/collisions/) |
+| Help-dialog introspection | ✗ | [`getKeymap()` with labels](/react/use-keymap/) |
+| User rebinding | ✗ | [recording built in](/react/use-shortcut-recorder/) |
+
+## The honest framing
+
+Both libraries got the key model right. The difference is what happens as an app grows:
+
+- **Context.** With tinykeys, "only in the editor, not read-only, no modal" is `if` statements in
+  every handler. With Tactile it's `when: "scope == 'editor' && !readOnly && !modalOpen"` — and the
+  [help dialog](/react/use-keymap/) automatically shows only what's active.
+- **Conflicts.** In tinykeys, two subscriptions to `$mod+K` both fire. Tactile resolves one winner
+  and can tell you about the conflict at registration time.
+- **Product features.** Keymap introspection and shortcut recording are the primitives behind
+  "keyboard shortcuts" settings pages — you'd build them by hand on tinykeys.
+
+## Side by side
+
+```js
+// tinykeys
+import { tinykeys } from 'tinykeys';
+
+const unsubscribe = tinykeys(window, {
+  '$mod+K': openPalette,
+  'g i': goToInbox,
+});
+```
+
+```ts
+// Tactile
+import { createKeybindingEngine } from '@tactile-js/core';
+const kb = createKeybindingEngine();
+
+const off1 = kb.add({ id: 'palette', keys: 'mod+k', handler: openPalette });
+const off2 = kb.add({ id: 'inbox', keys: 'g i', handler: goToInbox });
+```
+
+## Next steps
+
+- [Installation](/getting-started/installation/) · [Quick start](/getting-started/quick-start/)
+- [All libraries compared](/comparisons/)

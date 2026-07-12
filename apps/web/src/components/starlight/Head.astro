@@ -1,0 +1,107 @@
+---
+/**
+ * Head override: keeps Starlight's default head (title, description, canonical)
+ * and adds per-page Open Graph images plus structured data — TechArticle and
+ * BreadcrumbList on every docs page, and FAQPage on the introduction (whose
+ * visible FAQ section mirrors these questions).
+ */
+import Default from '@astrojs/starlight/components/Head.astro';
+
+const { id, entry, siteTitle } = Astro.locals.starlightRoute;
+const { title, description } = entry.data;
+
+const site = Astro.site ?? new URL('https://tactile-js.vercel.app');
+const pageUrl = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(`/og/${id || 'index'}.png`, site).href;
+
+const segments = id.split('/');
+const sectionNames: Record<string, string> = {
+  'getting-started': 'Getting started',
+  concepts: 'Core concepts',
+  core: 'Core API',
+  guides: 'Guides',
+  react: 'React',
+  comparisons: 'Comparisons',
+};
+
+const breadcrumbs = {
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: siteTitle, item: site.href },
+    ...(segments.length > 1 && sectionNames[segments[0]]
+      ? [{ '@type': 'ListItem', position: 2, name: sectionNames[segments[0]] }]
+      : []),
+    { '@type': 'ListItem', position: segments.length > 1 ? 3 : 2, name: title, item: pageUrl },
+  ],
+};
+
+const article = {
+  '@type': 'TechArticle',
+  headline: title,
+  description,
+  url: pageUrl,
+  image: ogImage,
+  author: { '@type': 'Person', name: 'Lohith Mallikarjun' },
+  publisher: { '@type': 'Organization', name: 'Tactile', url: site.href },
+};
+
+const faq =
+  id === 'getting-started/introduction'
+    ? {
+        '@type': 'FAQPage',
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'How do I add keyboard shortcuts to a JavaScript app?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Install @tactile-js/core, create an engine with createKeybindingEngine(), and register rules with kb.add({ id, keys, handler }). React apps can use the useShortcut hook from @tactile-js/react instead.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'How do I support ⌘ on Mac and Ctrl on Windows with one binding?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: "Use the mod alias: keys: 'mod+k' resolves to ⌘K on macOS and Ctrl+K on Windows and Linux, so you write a single binding string for every platform.",
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Why do keyboard shortcuts break on international keyboard layouts?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Most libraries rely on the deprecated keyCode, which maps inconsistently across layouts like QWERTZ, AZERTY, and Dvorak. Tactile matches on event.key and event.code with a hybrid strategy, so ⌘Z stays on the physical Z key while symbols like ? match the character.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'How do I stop shortcuts from firing while the user types in an input?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'By default Tactile ignores key events from input, textarea, select, and contenteditable elements. The ignore engine option lets you allow specific shortcuts through or disable the behavior entirely.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'What happens when two shortcuts use the same key combination?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Tactile detects collisions at registration time via getCollisions(), and resolves them at runtime by priority, then registration order — the same precedence model VS Code uses.',
+            },
+          },
+        ],
+      }
+    : null;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [article, breadcrumbs, ...(faq ? [faq] : [])],
+};
+---
+
+<Default><slot /></Default>
+<meta property="og:image" content={ogImage} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content={ogImage} />
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

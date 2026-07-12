@@ -1,5 +1,7 @@
 ---
-title: useShortcut
+title: 'useShortcut: a React keyboard shortcut hook'
+sidebar:
+  label: useShortcut
 description: Register keyboard shortcuts in React with useShortcut — stable handlers, when expressions, priority, and dependency control.
 ---
 
@@ -182,3 +184,9 @@ const { set } = useScope();
 useEffect(() => set('featureEnabled', featureEnabled), [featureEnabled]);
 useShortcut({ id: 'feature', keys: 'mod+f', when: 'featureEnabled', handler: runFeature });
 ```
+
+## Next steps
+
+- [useScope](/react/use-scope/) — drive the `when` context from components
+- [Key syntax](/concepts/key-syntax/) — everything `keys` accepts
+- [Playground](/playground/) — see these rules running live

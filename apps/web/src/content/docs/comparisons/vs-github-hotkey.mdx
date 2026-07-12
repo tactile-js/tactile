@@ -1,0 +1,59 @@
+---
+title: 'Tactile vs @github/hotkey'
+sidebar:
+  label: vs @github/hotkey
+description: '@github/hotkey binds shortcuts declaratively via data-hotkey attributes — great for server-rendered pages. Tactile is the programmatic engine for app-like UIs. Honest comparison.'
+---
+
+[@github/hotkey](https://www.npmjs.com/package/@github/hotkey) is a different paradigm, not a
+competitor: you annotate DOM elements with `data-hotkey="g i"` and pressing the keys **clicks or
+focuses that element**. It's what GitHub.com uses — perfect for server-rendered pages where every
+shortcut maps to a visible control.
+
+## At a glance
+
+| | @github/hotkey | Tactile |
+| --- | --- | --- |
+| Paradigm | declarative DOM attributes → click/focus element | programmatic rules → run handlers |
+| Best for | server-rendered pages (Rails/Django/static) | app-like UIs (SPAs, editors, palettes) |
+| Shortcut target | must be an element | any function |
+| Context | ✗ (element visibility is the gate) | [`when` expressions](/concepts/when-expressions/) |
+| Sequences | ✅ `"g i"` | ✅ `'g i'` |
+| Conflicts | last registered wins, silently | [detected + priority](/concepts/collisions/) |
+| Help dialog data | scrape `data-hotkey` attrs | [`getKeymap()`](/react/use-keymap/) |
+
+## When @github/hotkey is the right call
+
+Your shortcuts all mean "activate that button/link," your pages are server-rendered, and you want
+zero JS wiring:
+
+```html
+<a href="/inbox" data-hotkey="g i">Inbox</a>
+<button data-hotkey="Mod+k">Search</button>
+<script type="module">
+  import { install } from '@github/hotkey';
+  for (const el of document.querySelectorAll('[data-hotkey]')) install(el);
+</script>
+```
+
+That's genuinely hard to beat for that shape of app.
+
+## When you've outgrown it
+
+The model strains when a shortcut isn't element-shaped: toggle a mode, run a command with arguments,
+behave differently per context, or power a rebindable shortcut settings page. That's engine
+territory:
+
+```ts
+kb.add({
+  id: 'inbox',
+  keys: 'g i',
+  when: '!modalOpen',
+  description: 'Go to inbox',
+  handler: () => router.push('/inbox'),
+});
+```
+
+## Next steps
+
+- [Quick start](/getting-started/quick-start/) · [All libraries compared](/comparisons/)

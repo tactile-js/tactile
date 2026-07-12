@@ -1,0 +1,54 @@
+---
+title: 'Tactile vs react-hotkeys'
+sidebar:
+  label: vs react-hotkeys
+description: react-hotkeys alternative — replace the focus-tree HotKeys component model with hooks over a framework-agnostic engine; keep the keymap/action separation you liked.
+---
+
+[react-hotkeys](https://www.npmjs.com/package/react-hotkeys) (the `<HotKeys>` component library, not
+[react-hotkeys-hook](/comparisons/vs-react-hotkeys-hook/)) brought two great ideas to React:
+separating **key maps from actions**, and introspection via `getApplicationKeyMap()`. It's also
+heavy (~12 kB), Mousetrap-based underneath, tied to a focus-hierarchy model, and has been in
+low-maintenance mode for years.
+
+## At a glance
+
+| | react-hotkeys | Tactile |
+| --- | --- | --- |
+| API style | `<HotKeys keyMap handlers>` components / HoCs | hooks over a core engine |
+| Activation model | DOM focus hierarchy | [`when` context expressions](/concepts/when-expressions/) |
+| Key model | Mousetrap-era strings | `event.key` + `event.code`, [hybrid](/concepts/matching/) |
+| Introspection | `getApplicationKeyMap()` | [`useKeymap()` / `getKeymap()`](/react/use-keymap/) |
+| Recording | `recordKeyCombination()` | [`useShortcutRecorder()`](/react/use-shortcut-recorder/) |
+| Outside React | ✗ | ✅ core is framework-agnostic |
+| Size | ~12 kB | ~5.5 kB core + thin hooks |
+
+## Focus trees vs context
+
+react-hotkeys activates whichever `<HotKeys>` component wraps the focused element — powerful, but
+your shortcut behavior becomes a function of DOM structure. Tactile decouples activation from the
+tree: components declare `when` conditions; focus handlers set context.
+
+```tsx
+// react-hotkeys
+<HotKeys keyMap={{ BOLD: 'ctrl+b' }} handlers={{ BOLD: toggleBold }}>
+  <Editor />
+</HotKeys>
+```
+
+```tsx
+// Tactile
+function Editor() {
+  const { setScope } = useScope();
+  useShortcut({ id: 'bold', keys: 'ctrl+b', when: "scope == 'editor'", handler: toggleBold });
+  return <div onFocus={() => setScope('editor')} onBlur={() => setScope('global')} />;
+}
+```
+
+The keymap/handler separation you liked survives: keep a typed array of rule objects and register
+them in one place — rules are plain data.
+
+## Next steps
+
+- [React keyboard shortcuts](/react/overview/) — the full hooks API
+- [Installation](/getting-started/installation/) · [All libraries compared](/comparisons/)

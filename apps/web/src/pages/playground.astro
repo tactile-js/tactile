@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
+import ThemeSwitch from '../components/starlight/ThemeSwitch.astro';
 import Playground from '../components/playground/Playground.tsx';
 
 const title = 'Playground — Tactile keyboard shortcuts';
@@ -8,15 +8,19 @@ const description =
   'Operate a mini app entirely with keyboard shortcuts, live in your browser: command palette, sequences, scoped bindings, collision resolution — all running the real @tactile-js engine.';
 ---
 
-<Base title={title} description={description}>
+<Base title={title} description={description} themeable>
   <div class="pgpage">
-    <Nav />
-    <header class="pghead">
-      <h1>Playground</h1>
-      <p>
-        A mini notes app running the real <code>@tactile-js/core</code> engine — press shortcuts in
-        the app, watch the inspector on the right.
-      </p>
+    <header class="pgbar">
+      <div class="pgbar__left">
+        <a class="pgbar__brand" href="/">tactile<span aria-hidden="true">▊</span></a>
+        <span class="pgbar__sep" aria-hidden="true">/</span>
+        <h1 class="pgbar__title">Playground</h1>
+      </div>
+      <nav class="pgbar__links" aria-label="Site">
+        <a href="/getting-started/introduction/">Docs</a>
+        <a href="https://github.com/tactile-js/tactile">GitHub</a>
+        <ThemeSwitch />
+      </nav>
     </header>
     <Playground client:only="react">
       <p slot="fallback" class="pgx-muted" style="padding: 0 1.5rem;">Loading playground…</p>
@@ -31,40 +35,71 @@ const description =
     flex-direction: column;
     overflow: hidden;
   }
-  .pghead {
+  /* One slim bar, cohesive with the docs shell. The --sl-* shims feed the
+     ThemeSwitch component, which was built against Starlight's variables. */
+  .pgbar {
+    --sl-color-gray-6: var(--surface-2);
+    --sl-color-gray-4: var(--text-dim);
+    --sl-color-gray-3: var(--text-mute);
+    --sl-color-hairline: var(--border);
+    --sl-color-text-accent: var(--green);
+    --sl-color-white: var(--text);
+
     display: flex;
-    align-items: baseline;
+    align-items: center;
+    justify-content: space-between;
     gap: 1rem;
     max-width: var(--maxw);
     width: 100%;
     margin: 0 auto;
-    padding: 0 1.5rem 0.75rem;
+    padding: 0.9rem 1.5rem;
   }
-  .pghead h1 {
+  .pgbar__left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .pgbar__brand {
     font-family: var(--font-mono);
-    font-size: 1.1rem;
     font-weight: 500;
+    font-size: 1.05rem;
     letter-spacing: -0.02em;
-    margin: 0;
+    color: var(--text);
+    text-decoration: none;
   }
-  .pghead p {
-    font-size: 0.85rem;
-    color: var(--text-mute);
-    margin: 0;
-  }
-  .pghead code {
-    font-family: var(--font-mono);
+  .pgbar__brand span {
     color: var(--green);
-    font-size: 0.95em;
+  }
+  .pgbar__sep {
+    color: var(--text-mute);
+    font-family: var(--font-mono);
+  }
+  .pgbar__title {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--text-dim);
+    margin: 0;
+  }
+  .pgbar__links {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .pgbar__links a {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-decoration: none;
+  }
+  .pgbar__links a:hover {
+    color: var(--text);
   }
   @media (max-width: 900px) {
     .pgpage {
       height: auto;
       overflow: visible;
-    }
-    .pghead {
-      flex-direction: column;
-      gap: 0.25rem;
     }
   }
 </style>

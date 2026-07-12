@@ -1,0 +1,68 @@
+---
+title: 'Tactile vs hotkeys-js'
+sidebar:
+  label: vs hotkeys-js
+description: hotkeys-js alternative — Tactile upgrades named scopes to when-expressions, replaces keyCode matching with a layout-aware model, and adds collision detection. Migration guide included.
+---
+
+[hotkeys-js](https://www.npmjs.com/package/hotkeys-js) is one of the most-used shortcut libraries on
+npm, and it deserves it: actively maintained, dependency-free, with a real scope system
+(`setScope`/`getScope`) and an input filter. Its two structural limits are the deprecated `keyCode`
+key model and scopes that are flat names rather than expressions.
+
+## At a glance
+
+| | hotkeys-js | Tactile |
+| --- | --- | --- |
+| Key model | `keyCode` (deprecated) | `event.key` + `event.code`, [hybrid](/concepts/matching/) |
+| Scopes | one active named scope | [`when` expressions](/concepts/when-expressions/) — compose freely |
+| Conflicts | last binding silently stacks | [detected + priority](/concepts/collisions/) |
+| Input filter | global `hotkeys.filter` | per-engine [`ignore`](/core/engine-options/#ignore-event-keyevent--boolean) |
+| Sequences (`g i`) | ✗ | ✅ |
+| Introspection | key codes only | full [keymap with labels](/react/use-keymap/) |
+| Size | ~2.6 kB | ~5.5 kB |
+
+## Scopes vs when-expressions
+
+hotkeys-js has exactly one active scope at a time:
+
+```js
+hotkeys('ctrl+b', 'editor', toggleBold);
+hotkeys.setScope('editor');
+```
+
+Tactile's scopes are just context keys, so conditions compose:
+
+```ts
+kb.add({
+  id: 'bold',
+  keys: 'ctrl+b',
+  when: "scope == 'editor' && !readOnly && !modalOpen",
+  handler: toggleBold,
+});
+```
+
+With one active scope, "editor shortcuts, but not while a modal is open, but only when editable"
+forces scope-juggling in app code. With expressions it's one line on the rule.
+
+## Migration
+
+```js
+// hotkeys-js
+hotkeys('ctrl+a,ctrl+b', 'editor', (event, handler) => {
+  if (handler.key === 'ctrl+a') selectAll();
+  else bold();
+});
+```
+
+```ts
+// Tactile — one rule per command (ids power help dialogs + collisions)
+kb.add({ id: 'selectAll', keys: 'ctrl+a', when: "scope == 'editor'", handler: selectAll });
+kb.add({ id: 'bold', keys: 'ctrl+b', when: "scope == 'editor'", handler: bold });
+kb.context.set('scope', 'editor'); // replaces hotkeys.setScope('editor')
+```
+
+## Next steps
+
+- [Installation](/getting-started/installation/) · [Quick start](/getting-started/quick-start/)
+- [All libraries compared](/comparisons/)

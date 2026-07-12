@@ -1,15 +1,41 @@
 # Tactile
 
-> A modern, context-aware keyboard shortcut engine for the web. Layout-aware matching (event.key + event.code, never keyCode), VS Code-style `when` expressions, first-class collision detection, runtime recording, and platform-aware label formatting. A framework-agnostic core (@tactile-js/core) with a thin React adapter (@tactile-js/react).
+> A modern, context-aware keyboard shortcut engine for JavaScript and React. Layout-aware matching (event.key + event.code, never the deprecated keyCode), VS Code-style `when` expressions, first-class collision detection, sequences, runtime shortcut recording, and keymap introspection. Packages: @tactile-js/core (framework-agnostic) and @tactile-js/react (React hooks).
 
-## Docs
-- [Introduction](https://tactile-js.vercel.app/getting-started/introduction/)
+Complete docs in one file: https://tactile-js.vercel.app/llms-full.txt
+
+## Getting started
+- [Introduction (JavaScript keyboard shortcut library)](https://tactile-js.vercel.app/getting-started/introduction/)
 - [Installation](https://tactile-js.vercel.app/getting-started/installation/)
 - [Quick start](https://tactile-js.vercel.app/getting-started/quick-start/)
-- [Match modes (layout-aware)](https://tactile-js.vercel.app/concepts/matching/)
+
+## Core concepts
+- [Key syntax & bindings](https://tactile-js.vercel.app/concepts/key-syntax/)
+- [event.key vs event.code: match modes](https://tactile-js.vercel.app/concepts/matching/)
+- [International keyboards](https://tactile-js.vercel.app/concepts/international-keyboards/)
 - [Context & when expressions](https://tactile-js.vercel.app/concepts/when-expressions/)
 - [Collision detection](https://tactile-js.vercel.app/concepts/collisions/)
-- [React hooks](https://tactile-js.vercel.app/react/overview/)
+- [Limitations](https://tactile-js.vercel.app/concepts/limitations/)
+
+## React
+- [React keyboard shortcuts (overview)](https://tactile-js.vercel.app/react/overview/)
+- [useShortcut](https://tactile-js.vercel.app/react/use-shortcut/)
+- [useScope](https://tactile-js.vercel.app/react/use-scope/)
+- [useKeymap](https://tactile-js.vercel.app/react/use-keymap/)
+- [useShortcutRecorder](https://tactile-js.vercel.app/react/use-shortcut-recorder/)
+
+## API
+- [Core API reference](https://tactile-js.vercel.app/core/api-reference/)
+- [Engine options](https://tactile-js.vercel.app/core/engine-options/)
+- [Recipes & examples](https://tactile-js.vercel.app/guides/recipes/)
+
+## Comparisons
+- [JavaScript keyboard shortcut libraries compared](https://tactile-js.vercel.app/comparisons/)
+- [vs Mousetrap](https://tactile-js.vercel.app/comparisons/vs-mousetrap/) · [vs hotkeys-js](https://tactile-js.vercel.app/comparisons/vs-hotkeys-js/) · [vs tinykeys](https://tactile-js.vercel.app/comparisons/vs-tinykeys/) · [vs keymaster](https://tactile-js.vercel.app/comparisons/vs-keymaster/) · [vs react-hotkeys-hook](https://tactile-js.vercel.app/comparisons/vs-react-hotkeys-hook/) · [vs react-hotkeys](https://tactile-js.vercel.app/comparisons/vs-react-hotkeys/) · [vs @github/hotkey](https://tactile-js.vercel.app/comparisons/vs-github-hotkey/) · [vs Combokeys](https://tactile-js.vercel.app/comparisons/vs-combokeys/)
+
+## Tools
+- [Live KeyboardEvent inspector (JavaScript key codes)](https://tactile-js.vercel.app/tools/key-inspector/)
+- [Playground](https://tactile-js.vercel.app/playground/)
 
 ## Source
 - [GitHub](https://github.com/tactile-js/tactile)

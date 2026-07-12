@@ -105,45 +105,8 @@ useShortcut({
 
 ## Scoped editor shortcuts
 
-```tsx
-function Editor() {
-  const { setScope } = useScope();
-  const [bold, setBold] = useState(false);
-
-  useShortcut({
-    id: 'editor.bold',
-    keys: 'mod+b',
-    when: "scope == 'editor'",
-    group: 'Editing',
-    description: 'Toggle bold',
-    handler: () => setBold((b) => !b),
-  });
-
-  return (
-    <div
-      tabIndex={0}
-      contentEditable
-      style={{ fontWeight: bold ? 700 : 400 }}
-      onFocus={() => setScope('editor')}
-      onBlur={() => setScope('global')}
-    />
-  );
-}
-```
-
-### Multiple scope flags
-
-```tsx
-const { enableScope, disableScope } = useScope();
-
-// Gate with: when "scope.terminal"
-enableScope('terminal');
-
-// Or independent context keys:
-const { set } = useScope();
-set('modalOpen', true);
-// when: "!modalOpen"
-```
+Focus sets the scope; `when` gates the rule. The full pattern — single active scope, multiple scope
+flags, and the modal variant — lives in [useScope](/react/use-scope/).
 
 ## Sequences (Gmail-style)
 
@@ -154,12 +117,11 @@ kb.add({
   description: 'Go to inbox',
   handler: () => router.push('/inbox'),
 });
-
-// Optional: longer timeout for accessibility
-createKeybindingEngine({ sequenceTimeout: 3000 });
 ```
 
-Single-letter prefixes (`g` alone) won't fire unless you register them — only complete sequences match.
+Single-letter prefixes (`g` alone) won't fire unless you register them — only complete sequences
+match. The stroke gap is configurable via
+[`sequenceTimeout`](/core/engine-options/#sequencetimeout-number).
 
 ## Alternative bindings (cross-platform)
 
@@ -207,13 +169,14 @@ function wouldCollide(engine: KeybindingEngine, binding: string, id: string) {
 }
 ```
 
-## Custom event source (Electron / tests)
+## Simulating key presses in tests
+
+The [`source` option](/core/engine-options/#source-keyeventsource) makes the engine fully testable
+in Node — inject an in-memory source and drive it yourself:
 
 ```ts
 import { createKeybindingEngine, type KeyEvent } from '@tactile-js/core';
 
-// Node test — no DOM
-const events: Array<{ type: 'keydown'; event: KeyEvent }> = [];
 const listeners = new Map<string, Set<(e: KeyEvent) => void>>();
 
 const kb = createKeybindingEngine({
@@ -229,7 +192,6 @@ const kb = createKeybindingEngine({
 
 kb.add({ id: 'save', keys: 'mod+s', handler: save });
 
-// Simulate keypress
 function press(e: KeyEvent) {
   for (const fn of listeners.get('keydown') ?? []) fn(e);
 }
@@ -237,31 +199,10 @@ function press(e: KeyEvent) {
 press({ key: 's', code: 'KeyS', metaKey: true, ctrlKey: false, shiftKey: false, altKey: false });
 ```
 
-## Input fields: three strategies
+## Input fields
 
-### 1. Default ignore (recommended)
-
-Shortcuts don't fire in inputs. No extra work.
-
-### 2. Per-shortcut `when` (VS Code style)
-
-```ts
-createKeybindingEngine({ ignore: () => false });
-
-kb.add({ id: 'bold', keys: 'mod+b', when: 'editorFocus', handler: bold });
-kb.add({ id: 'palette', keys: 'mod+k', when: '!textInputFocus', handler: palette });
-```
-
-### 3. Selective passthrough
-
-```ts
-createKeybindingEngine({
-  ignore: (event) => {
-    if (event.metaKey && event.code === 'KeyS') return false; // save everywhere
-    return defaultIgnore(event);
-  },
-});
-```
+Three strategies — default ignore, per-shortcut `when` gating, and selective passthrough — with code
+for each in [Engine options → `ignore`](/core/engine-options/#ignore-event-keyevent--boolean).
 
 ## Handler: skip preventDefault
 

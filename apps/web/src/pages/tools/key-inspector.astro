@@ -1,0 +1,307 @@
+---
+import Base from '../../layouts/Base.astro';
+import ThemeSwitch from '../../components/starlight/ThemeSwitch.astro';
+import KeyInspectorTool from '../../components/tools/KeyInspectorTool.tsx';
+
+const title = 'JavaScript key codes — live KeyboardEvent inspector';
+const description =
+  'Press any key to see its event.key, event.code, modifiers, and deprecated keyCode — plus which signal to match on and a copy-ready shortcut binding string. Free online KeyboardEvent tester.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'KeyboardEvent inspector',
+      url: 'https://tactile-js.vercel.app/tools/key-inspector/',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Web',
+      offers: { '@type': 'Offer', price: '0' },
+      description,
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is the difference between event.key and event.code?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'event.key is the character the keystroke produces ("z", "?", "Enter") and changes with the keyboard layout. event.code is the physical key position ("KeyZ", "Slash") and stays the same on every layout. Keyboard shortcuts usually want code for letters and key for symbols.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is KeyboardEvent.keyCode deprecated?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. keyCode (and which) are deprecated in the UI Events specification and behave inconsistently across browsers and international layouts. Use event.key and event.code instead.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Base title={title} description={description} jsonLd={jsonLd} themeable>
+  <div class="kip">
+    <header class="kip-bar">
+      <div class="kip-bar__left">
+        <a class="kip-bar__brand" href="/">tactile<span aria-hidden="true">▊</span></a>
+        <span class="kip-bar__sep" aria-hidden="true">/</span>
+        <span class="kip-bar__crumb">tools</span>
+      </div>
+      <nav class="kip-bar__links" aria-label="Site">
+        <a href="/getting-started/introduction/">Docs</a>
+        <a href="/playground/">Playground</a>
+        <ThemeSwitch />
+      </nav>
+    </header>
+
+    <main class="kip-main">
+      <h1>JavaScript key codes, live</h1>
+      <p class="kip-lede">
+        Press any key. See its <code>event.key</code>, <code>event.code</code>, modifiers, and the
+        deprecated <code>keyCode</code> — plus a copy-ready binding string.
+      </p>
+
+      <KeyInspectorTool client:only="react" />
+
+      <section class="kip-explain">
+        <h2>event.key vs event.code — which should shortcuts use?</h2>
+        <p>
+          <code>event.key</code> is the <strong>character</strong> the keystroke produces (<code
+            >"z"</code
+          >, <code>"?"</code>, <code>"Enter"</code>) — it changes with the keyboard layout.
+          <code>event.code</code> is the <strong>physical key position</strong> (<code>KeyZ</code>,
+          <code>Slash</code>) — identical on QWERTY, QWERTZ, AZERTY, and Dvorak.
+          <code>keyCode</code> and <code>which</code> are deprecated and inconsistent; don't ship new
+          code on them.
+        </p>
+        <p>
+          For shortcuts, the right answer is <em>both</em>, chosen per key: letters and digits by
+          position (so ⌘Z stays on the Z keycap in Germany), symbols and named keys by character (so
+          <code>?</code> means the glyph). That policy is
+          <a href="/concepts/matching/">Tactile's hybrid match mode</a> — the engine behind this
+          page.
+        </p>
+      </section>
+    </main>
+  </div>
+</Base>
+
+<style>
+  .kip {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  .kip-bar {
+    --sl-color-gray-6: var(--surface-2);
+    --sl-color-gray-4: var(--text-dim);
+    --sl-color-gray-3: var(--text-mute);
+    --sl-color-hairline: var(--border);
+    --sl-color-text-accent: var(--green);
+    --sl-color-white: var(--text);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0.9rem 1.5rem;
+  }
+  .kip-bar__left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+  }
+  .kip-bar__brand {
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .kip-bar__brand span {
+    color: var(--green);
+  }
+  .kip-bar__sep,
+  .kip-bar__crumb {
+    color: var(--text-mute);
+    font-size: 0.9rem;
+  }
+  .kip-bar__links {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .kip-bar__links a {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-decoration: none;
+  }
+  .kip-bar__links a:hover {
+    color: var(--text);
+  }
+  .kip-main {
+    flex: 1;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.75rem;
+  }
+  .kip-lede {
+    color: var(--text-dim);
+    max-width: 40rem;
+    margin: 0 0 2rem;
+  }
+  .kip-lede code,
+  .kip-explain code {
+    font-family: var(--font-mono);
+    color: var(--green);
+    font-size: 0.92em;
+  }
+  .kip-explain {
+    margin-top: 3rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+  }
+  .kip-explain h2 {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
+  }
+  .kip-explain p {
+    color: var(--text-dim);
+    max-width: 44rem;
+  }
+  .kip-explain a {
+    color: var(--green);
+  }
+</style>
+
+<style is:global>
+  .kit-empty {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 1.4rem;
+    padding: 2.5rem 0;
+  }
+  .kit-hero {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .kit-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .kit-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .kit-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-mute);
+  }
+  .kit-label em {
+    text-transform: none;
+    font-style: normal;
+    color: var(--coral);
+  }
+  .kit-value {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--text);
+    overflow-wrap: anywhere;
+  }
+  .kit-value--big {
+    font-size: 1.8rem;
+    color: var(--green);
+  }
+  .kit-value--strike {
+    text-decoration: line-through;
+    color: var(--text-mute);
+  }
+  .kit-accent {
+    color: var(--green);
+  }
+  .kit-binding {
+    background: var(--surface);
+    border: 1px solid var(--green-dim);
+    border-radius: var(--radius-lg);
+    padding: 0.9rem 1.1rem;
+  }
+  .kit-binding__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.4rem;
+  }
+  .kit-binding__row code {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--text);
+  }
+  .kit-binding__row button {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 0.35rem 0.7rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .kit-binding__row button:hover {
+    color: var(--green);
+    border-color: var(--green-dim);
+  }
+  .kit-history {
+    margin-top: 1.5rem;
+  }
+  .kit-history ul {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .kit-history li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-mute);
+  }
+  .kit-history li code {
+    color: var(--text-dim);
+  }
+</style>

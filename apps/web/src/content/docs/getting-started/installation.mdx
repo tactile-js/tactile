@@ -1,17 +1,37 @@
 ---
 title: Installation
-description: Install @tactile-js/core and @tactile-js/react with npm, pnpm, or yarn.
+description: Install the Tactile keyboard shortcut library — @tactile-js/core (framework-agnostic) and @tactile-js/react (React hooks) — with npm, pnpm, or yarn.
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 Install the core engine, and the React adapter if you're using React.
 
-```bash
-# framework-agnostic core
-npm install @tactile-js/core
+<Tabs syncKey="pkg">
+  <TabItem label="npm">
+    ```bash
+    # framework-agnostic core
+    npm install @tactile-js/core
 
-# React hooks (pulls in core)
-npm install @tactile-js/react
-```
+    # React hooks (pulls in core)
+    npm install @tactile-js/react
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add @tactile-js/core
+
+    pnpm add @tactile-js/react
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add @tactile-js/core
+
+    yarn add @tactile-js/react
+    ```
+  </TabItem>
+</Tabs>
 
 `@tactile-js/react` lists `react >= 17` as a peer dependency.
 

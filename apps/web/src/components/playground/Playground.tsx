@@ -64,7 +64,12 @@ function CommandPalette({ commands, onClose }: { commands: Command[]; onClose: (
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => inputRef.current?.focus(), []);
+  // Focus the query on open; return focus to wherever the user was on close.
+  useEffect(() => {
+    const prev = document.activeElement as HTMLElement | null;
+    inputRef.current?.focus();
+    return () => prev?.focus?.();
+  }, []);
 
   const filtered = useMemo(
     () => commands.filter((c) => c.label.toLowerCase().includes(query.toLowerCase())),
@@ -125,6 +130,12 @@ function CommandPalette({ commands, onClose }: { commands: Command[]; onClose: (
 function HelpOverlay({ onClose }: { onClose: () => void }) {
   const [activeOnly, setActiveOnly] = useState(false);
   const keymap = useKeymap({ forContext: activeOnly });
+
+  // Return focus to wherever the user was when the dialog closes.
+  useEffect(() => {
+    const prev = document.activeElement as HTMLElement | null;
+    return () => prev?.focus?.();
+  }, []);
 
   const groups = new Map<string, typeof keymap>();
   for (const rule of keymap) {

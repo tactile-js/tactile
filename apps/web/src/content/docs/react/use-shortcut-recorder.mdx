@@ -53,6 +53,14 @@ function RebindButton() {
 
 ## Save to settings
 
+`wouldCollide` here is a small helper over `getCollisions()`:
+
+```ts
+function wouldCollide(engine: KeybindingEngine, binding: string) {
+  return engine.getCollisions().some((c) => c.keys === binding);
+}
+```
+
 ```tsx
 function ShortcutSettings() {
   const engine = useEngine();
@@ -94,3 +102,8 @@ const stop = kb.recordShortcut(({ binding, label }) => {
 });
 // stop(); // cancel
 ```
+
+## Next steps
+
+- [Collision detection](/concepts/collisions/) — validating a recorded binding before saving
+- [Playground](/playground/) — try the recorder live under "Advanced"
